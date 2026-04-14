@@ -1,0 +1,173 @@
+# Copyright (C) 2026 omhotey
+# This file is distributed under the GPLv2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: NetChat 1.0.0\n"
+"Report-Msgid-Bugs-To: https://github.com/omhotey/WP-NetChat/issues\n"
+"POT-Creation-Date: 2026-04-11 00:00:00+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2026-04-11 00:00:00+0000\n"
+"Last-Translator: omhotey\n"
+"Language-Team: English (US)\n"
+"Language: en_US\n"
+"X-Generator: wp-dev-tools\n"
+"X-Domain: netchat\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: includes/admin.php
+msgid "NetChat Settings"
+msgstr "NetChat Settings"
+
+#: includes/admin.php
+msgid "Messengers"
+msgstr "Messengers"
+
+#: includes/admin.php
+msgid "Position"
+msgstr "Position"
+
+#: includes/admin.php
+msgid "Bottom Left"
+msgstr "Bottom Left"
+
+#: includes/admin.php
+msgid "Bottom Right"
+msgstr "Bottom Right"
+
+#: includes/admin.php
+msgid "Right"
+msgstr "Right"
+
+#: includes/admin.php
+msgid "Bottom"
+msgstr "Bottom"
+
+#: includes/admin.php
+msgid "Appearance"
+msgstr "Appearance"
+
+#: includes/admin.php
+msgid "Size"
+msgstr "Size"
+
+#: includes/admin.php
+msgid "Animation"
+msgstr "Animation"
+
+#: includes/admin.php
+msgid "Color"
+msgstr "Color"
+
+#: includes/admin.php
+msgid "Greeting Message"
+msgstr "Greeting Message"
+
+#: includes/admin.php
+msgid "Show greeting message"
+msgstr "Show greeting message"
+
+#: includes/admin.php
+msgid "e.g. Need help?"
+msgstr "e.g. Need help?"
+
+#: includes/admin.php
+msgid "HTML supported: <b>, <i>, <br>, <a href>"
+msgstr "HTML supported: <b>, <i>, <br>, <a href>"
+
+#: includes/admin.php
+msgid "Show delay"
+msgstr "Show delay"
+
+#: includes/admin.php
+msgid "sec"
+msgstr "sec"
+
+#: includes/admin.php
+msgid "Visibility"
+msgstr "Visibility"
+
+#: includes/admin.php
+msgid "Desktop"
+msgstr "Desktop"
+
+#: includes/admin.php
+msgid "Mobile"
+msgstr "Mobile"
+
+#: includes/admin.php
+msgid "Save Settings"
+msgstr "Save Settings"
+
+#: includes/admin.php
+msgid "Reset Settings"
+msgstr "Reset Settings"
+
+#: includes/admin.php
+msgid "Author:"
+msgstr "Author:"
+
+#: includes/admin.php
+msgid "free"
+msgstr "free"
+
+#: includes/admin.php
+msgid "No ads"
+msgstr "No ads"
+
+#: includes/admin.php
+msgid "No tracking"
+msgstr "No tracking"
+
+#: includes/admin.php
+msgid "Like NetChat? Support the author!"
+msgstr "Like NetChat? Support the author!"
+
+#: includes/admin.php
+msgid "This project is free and made with love. If it helped you — you can support the development."
+msgstr "This project is free and made with love. If it helped you — you can support the development."
+
+#: includes/admin.php
+msgid "Thank you to everyone!"
+msgstr "Thank you to everyone!"
+
+#: includes/frontend.php
+msgid "Open contact menu"
+msgstr "Open contact menu"
+
+#: netchat.php
+msgid "Settings"
+msgstr "Settings"
+
+#: includes/helpers.php
+msgid "Telegram"
+msgstr "Telegram"
+
+#: includes/helpers.php
+msgid "WhatsApp"
+msgstr "WhatsApp"
+
+#: includes/helpers.php
+msgid "Vkontakte"
+msgstr "Vkontakte"
+
+#: includes/helpers.php
+msgid "MAX"
+msgstr "MAX"
+
+#: includes/helpers.php
+msgid "Viber"
+msgstr "Viber"
+
+#: includes/helpers.php
+msgid "Facebook"
+msgstr "Facebook"
+
+#: includes/helpers.php
+msgid "Email"
+msgstr "Email"
+
+#: includes/helpers.php
+msgid "Phone"
+msgstr "Phone"

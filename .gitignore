@@ -1,0 +1,8 @@
+.qwen/
+netchat-clean/
+*.log
+*.tmp
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

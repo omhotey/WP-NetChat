@@ -1,0 +1,652 @@
+/**
+ * NetChat Admin Styles - Material Design 3
+ * Author: omhotey
+ */
+
+/* ===== PAGE RESET ===== */
+.netchat-standalone-page {
+    max-width: 1140px;
+    margin: 20px auto;
+    padding: 0 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Notice container */
+#netchat-notice-container {
+    margin-bottom: 16px;
+}
+
+@keyframes ncFadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== LAYOUT ===== */
+.netchat-layout {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 20px;
+    align-items: start;
+    animation: ncFadeIn 0.5s ease;
+}
+
+/* ===== GENERIC CARD ===== */
+.nc-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.nc-card:last-child {
+    margin-bottom: 0;
+}
+
+/* ===== CARD TITLES ===== */
+.nc-card-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #64748b;
+    margin-bottom: 14px;
+}
+
+/* ===== TOGGLE SWITCH (MD3) ===== */
+.nc-toggle {
+    position: relative;
+    width: 48px;
+    height: 28px;
+    flex-shrink: 0;
+}
+.nc-toggle input[type="checkbox"] {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+.nc-slider {
+    position: absolute;
+    inset: 0;
+    background: #cbd5e1;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.nc-slider::before {
+    content: '';
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    left: 3px;
+    top: 3px;
+    background: #ffffff;
+    border-radius: 50%;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+.nc-toggle input[type="checkbox"]:checked + .nc-slider {
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+}
+.nc-toggle input[type="checkbox"]:checked + .nc-slider::before {
+    transform: translateX(20px);
+}
+
+/* ===== INPUTS (MD3) ===== */
+.nc-input,
+.nc-ap-row input[type="number"],
+.nc-pos-input-wrap input,
+.nc-greeting-textarea,
+.nc-greeting-delay input {
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    color: #1e293b;
+    background: #ffffff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.nc-input:focus,
+.nc-ap-row input[type="number"]:focus,
+.nc-pos-input-wrap input:focus,
+.nc-greeting-textarea:focus,
+.nc-greeting-delay input:focus {
+    border-color: #2563eb;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+/* ==========================================================================
+   MESSENGER CARDS
+   ========================================================================== */
+.nc-messenger-card {
+    background: #ffffff;
+    border: 1.5px solid #e8ecf0;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    transition: box-shadow 0.2s;
+}
+.nc-messenger-card:last-child {
+    margin-bottom: 0;
+}
+.nc-messenger-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.nc-messenger-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.nc-messenger-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+.nc-messenger-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.nc-messenger-icon svg {
+    width: 24px;
+    height: 24px;
+    fill: #ffffff;
+}
+.nc-messenger-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e293b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Messenger input (hidden by default, shown when toggle is on) */
+.nc-messenger-input {
+    display: none;
+    margin-top: 12px;
+    animation: ncFadeIn 0.25s ease;
+}
+.nc-messenger-input.visible {
+    display: block;
+}
+.nc-input-wrap {
+    position: relative;
+}
+.nc-input {
+    width: 100%;
+    padding: 9px 40px 9px 12px;
+    line-height: 1.5;
+}
+.nc-input::placeholder {
+    color: #94a3b8;
+}
+.nc-input-status {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+   POSITION CARD - light blue bg
+   ========================================================================== */
+.nc-card-position {
+    background: linear-gradient(135deg, #eff6ff, #f0f6ff);
+}
+.nc-pos-buttons {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+.nc-pos-btn {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #ffffff;
+    color: #94a3b8;
+    font-family: inherit;
+}
+.nc-pos-btn:hover {
+    border-color: #94a3b8;
+    color: #475569;
+}
+.nc-pos-btn.nc-pos-active {
+    border-color: #2563eb;
+    background: #ffffff;
+    color: #2563eb;
+    box-shadow: 0 0 0 1px #2563eb;
+}
+.nc-pos-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.nc-pos-row:last-child {
+    margin-bottom: 0;
+}
+.nc-pos-row > label {
+    font-size: 13px;
+    font-weight: 500;
+    width: 60px;
+    color: #64748b;
+    flex-shrink: 0;
+}
+.nc-pos-input-wrap {
+    display: flex;
+    align-items: center;
+}
+.nc-pos-input-wrap input {
+    width: 70px;
+    padding: 8px 10px;
+    text-align: center;
+}
+.nc-unit {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-left: 4px;
+}
+
+/* ==========================================================================
+   APPEARANCE CARD - light purple bg
+   ========================================================================== */
+.nc-card-appearance {
+    background: linear-gradient(135deg, #faf5ff, #fefaff);
+}
+.nc-ap-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+}
+.nc-ap-row:last-child {
+    margin-bottom: 0;
+}
+.nc-ap-row > label {
+    font-size: 13px;
+    font-weight: 500;
+    width: 80px;
+    color: #64748b;
+    flex-shrink: 0;
+}
+.nc-ap-row input[type="number"] {
+    width: 70px;
+    padding: 8px 10px;
+    text-align: center;
+}
+.nc-ap-row .nc-ap-unit {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-left: 4px;
+}
+.nc-ap-row input[type="color"] {
+    width: 44px;
+    height: 36px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 2px;
+    background: #ffffff;
+    transition: border-color 0.2s;
+}
+.nc-ap-row input[type="color"]:focus {
+    border-color: #2563eb;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+/* ==========================================================================
+   GREETING CARD - light yellow bg
+   ========================================================================== */
+.nc-card-greeting {
+    background: linear-gradient(135deg, #fffbeb, #fffdf0);
+}
+.nc-greeting-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+.nc-greeting-label {
+    font-size: 13px;
+    color: #64748b;
+}
+
+/* Greeting fields container - animated show/hide */
+.nc-greeting-fields {
+    overflow: hidden;
+    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+}
+.nc-greeting-fields.hidden {
+    opacity: 0;
+    max-height: 0;
+    margin: 0;
+    pointer-events: none;
+}
+.nc-greeting-fields.visible {
+    opacity: 1;
+    max-height: 500px;
+}
+
+/* Editor toolbar */
+.nc-editor-toolbar {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 8px;
+    padding: 4px;
+    background: #f1f5f9;
+    border-radius: 8px;
+}
+.nc-editor-btn {
+    width: 32px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    color: #475569;
+    font-family: inherit;
+}
+.nc-editor-btn:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+/* Textarea */
+.nc-greeting-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #1e293b;
+    resize: vertical;
+    font-family: inherit;
+    line-height: 1.5;
+    min-height: 60px;
+    box-sizing: border-box;
+}
+.nc-greeting-textarea::placeholder {
+    color: #94a3b8;
+}
+.nc-editor-hint {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 4px;
+}
+
+/* Delay row */
+.nc-greeting-delay {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: #f1f5f9;
+    border-radius: 8px;
+}
+.nc-greeting-delay > label {
+    font-size: 12px;
+    color: #64748b;
+    flex: 1;
+}
+.nc-delay-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.nc-delay-wrap input {
+    width: 56px;
+    padding: 6px 8px;
+    text-align: center;
+    font-size: 13px;
+}
+.nc-delay-unit {
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+/* ==========================================================================
+   VISIBILITY CARD - light green bg
+   ========================================================================== */
+.nc-card-visibility {
+    background: linear-gradient(135deg, #f0fdf4, #f0fdf9);
+}
+.nc-vis-row {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+.nc-vis-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #475569;
+    cursor: pointer;
+}
+.nc-vis-check input[type="checkbox"] {
+    accent-color: #2563eb;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+.nc-vis-check em {
+    font-style: italic;
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   LANGUAGE CARD - light blue bg
+   ========================================================================== */
+.nc-card-language {
+    background: linear-gradient(135deg, #eff6ff, #f0f4ff);
+}
+.nc-lang-btns {
+    display: flex;
+    gap: 8px;
+}
+.nc-lang-opt {
+    padding: 8px 18px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #ffffff;
+    color: #64748b;
+    font-weight: 500;
+    font-family: inherit;
+}
+.nc-lang-opt:hover {
+    border-color: #94a3b8;
+}
+.nc-lang-opt em {
+    font-style: italic;
+    font-weight: 700;
+    margin-right: 4px;
+}
+.nc-lang-opt.active {
+    border-color: #2563eb;
+    color: #2563eb;
+    background: #ffffff;
+    box-shadow: 0 0 0 1px #2563eb;
+}
+
+/* ==========================================================================
+   BOTTOM BAR
+   ========================================================================== */
+.netchat-bottom-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding-bottom: 40px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.nc-btn-group {
+    display: flex;
+    gap: 10px;
+}
+
+/* Save button - primary */
+.nc-save-btn {
+    padding: 12px 28px;
+    background: #2563eb;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+    white-space: nowrap;
+    font-family: inherit;
+    position: relative;
+    overflow: hidden;
+}
+.nc-save-btn:hover {
+    background: #1d4ed8;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+}
+.nc-save-btn:active {
+    transform: scale(0.98);
+}
+.nc-save-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Reset button - outlined */
+.nc-reset-btn {
+    padding: 12px 22px;
+    background: #ffffff;
+    color: #64748b;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    font-family: inherit;
+}
+.nc-reset-btn:hover {
+    border-color: #cbd5e1;
+    color: #1e293b;
+    background: #f8fafc;
+}
+
+/* Footer text */
+.nc-footer-text {
+    font-size: 12px;
+    color: #94a3b8;
+}
+.nc-footer-text a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+}
+.nc-footer-text a:hover {
+    text-decoration: underline;
+}
+
+/* Notice styles */
+.netchat-notice {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    animation: ncFadeIn 0.3s ease;
+    border-left: 4px solid;
+}
+.netchat-notice.success {
+    background: #f0fdf4;
+    border-color: #22c55e;
+    color: #166534;
+}
+.netchat-notice.error {
+    background: #fef2f2;
+    border-color: #ef4444;
+    color: #991b1b;
+}
+
+/* Sortable placeholder */
+.nc-sort-placeholder {
+    height: 76px;
+    background: #eff6ff;
+    border: 2px dashed #2563eb;
+    border-radius: 12px;
+    margin-bottom: 10px;
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 900px) {
+    .netchat-layout {
+        grid-template-columns: 1fr;
+    }
+    .netchat-bottom-bar {
+        justify-content: center;
+        text-align: center;
+    }
+    .nc-btn-group {
+        justify-content: center;
+        width: 100%;
+    }
+}
+
+@media (max-width: 782px) {
+    .nc-ap-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+    .nc-ap-row > label {
+        width: auto;
+    }
+    .nc-pos-buttons {
+        flex-direction: column;
+    }
+    .nc-lang-btns {
+        flex-direction: column;
+    }
+    .nc-vis-row {
+        flex-direction: column;
+        gap: 12px;
+    }
+}

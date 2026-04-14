@@ -1,0 +1,234 @@
+/**
+ * NetChat Frontend Styles
+ * Author: omhotey
+ */
+
+/* Animations */
+@keyframes ncPop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ncPulse{0%,100%{box-shadow:0 4px 16px rgba(0,0,0,0.18)}50%{box-shadow:0 4px 24px rgba(37,99,235,0.35)}}
+@keyframes ncFadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ncBounce{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+
+/* Reset */
+#netchat,#netchat *{box-sizing:border-box;margin:0;padding:0}
+
+/* Container */
+#netchat{
+    position:fixed;
+    z-index:999999;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    line-height:1.5;
+    animation:ncFadeInUp .5s ease both;
+}
+
+/* Layout */
+.nc-col{display:flex;flex-direction:column;align-items:center;gap:10px}
+
+/* Buttons - base */
+.nc-btn{
+    width:var(--nc-size,56px);
+    height:var(--nc-size,56px);
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;border:none;text-decoration:none;
+    transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s ease;
+    box-shadow:0 4px 16px rgba(0,0,0,0.18);
+    overflow:visible;padding:0;margin:0;position:relative;
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;
+}
+.nc-btn:hover{transform:scale(1.15);box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+.nc-btn:active{transform:scale(0.95)}
+.nc-btn:focus-visible{outline:2px solid var(--nc-color,#2563eb);outline-offset:3px}
+
+/* SVG icons inside buttons */
+.nc-btn svg{
+    width:var(--nc-icon,28px);
+    height:var(--nc-icon,28px);
+    fill:currentColor;
+    flex-shrink:0;
+    pointer-events:none;
+}
+
+/* === MAIN BUTTON (3-dot trigger) === */
+.nc-btn.nc-main{
+    background:var(--nc-color,#2563eb);
+    color:#fff;
+    z-index:2;
+    animation:ncPulse 2.5s ease-in-out infinite;
+}
+.nc-btn.nc-main:hover{animation:none}
+.nc-btn.nc-main svg{fill:#fff;color:#fff}
+
+/* Gradient backgrounds for each messenger button */
+.nc-btn.nc-telegram  {background:linear-gradient(135deg,#0088cc,#00aaff);color:#fff}
+.nc-btn.nc-whatsapp  {background:linear-gradient(135deg,#25D366,#128C7E);color:#fff}
+.nc-btn.nc-vk        {background:linear-gradient(135deg,#0077FF,#0055cc);color:#fff}
+.nc-btn.nc-max       {background:linear-gradient(135deg,#FF5722,#FF9800);color:#fff}
+.nc-btn.nc-viber     {background:linear-gradient(135deg,#7360F2,#59267C);color:#fff}
+.nc-btn.nc-messenger {background:linear-gradient(135deg,#0695FF,#A334FA);color:#fff}
+.nc-btn.nc-email     {background:linear-gradient(135deg,#EA4335,#c5221f);color:#fff}
+.nc-btn.nc-phone     {background:linear-gradient(135deg,#34C759,#248a3d);color:#fff}
+
+/* === BUBBLE (messenger list) === */
+.nc-bubble{
+    display:flex;flex-direction:column;gap:10px;
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transform:translateY(12px) scale(0.92);
+    transform-origin:bottom center;
+    transition:opacity .3s ease,transform .3s ease,visibility .3s ease;
+}
+.nc-bubble.nc-open{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+    transform:translateY(0) scale(1);
+}
+/* Stagger animation for individual messenger buttons */
+.nc-bubble .nc-btn{
+    opacity:0;
+    transform:translateY(8px);
+}
+.nc-bubble.nc-open .nc-btn{
+    animation:ncPop .3s ease forwards;
+}
+
+/* === Main button wrapper === */
+.nc-main-wrap{
+    position:relative;
+}
+.nc-main-wrap::before{
+    content:"";
+    position:absolute;
+    inset:-6px;
+    border-radius:50%;
+    background:radial-gradient(circle,var(--nc-color,#2563eb) 22%,transparent 70%);
+    opacity:0;
+    transition:opacity .3s ease;
+    z-index:1;
+    pointer-events:none;
+}
+.nc-main-wrap:hover::before{opacity:.15}
+
+/* === Online indicator (always green) === */
+.nc-btn.nc-main::after{
+    content:'';position:absolute;
+    width:12px;height:12px;
+    background:linear-gradient(135deg,#10b981,#34d399);
+    border-radius:50%;
+    top:2px;right:2px;
+    border:2px solid #fff;
+    box-shadow:0 0 8px rgba(16,185,129,0.6);
+    z-index:3;pointer-events:none;
+}
+
+/* === Hint tooltip bubble === */
+.nc-hint{
+    position:absolute;bottom:calc(100% + 12px);right:0;
+    background:#fff;color:#1e293b;
+    padding:10px 14px;border-radius:12px;
+    font-size:13px;line-height:1.5;
+    border:1px solid rgba(0,0,0,0.08);
+    box-shadow:0 8px 24px rgba(0,0,0,0.12);
+    opacity:0;visibility:hidden;pointer-events:none;
+    transition:opacity .35s ease,transform .35s ease,visibility .35s ease;
+    z-index:10;min-width:180px;max-width:240px;
+    word-wrap:break-word;white-space:normal;
+    transform:translateY(8px);
+}
+.nc-hint.nc-visible{
+    opacity:1;visibility:visible;pointer-events:auto;
+    transform:translateY(0);
+}
+.nc-hint::after{
+    content:'';position:absolute;bottom:-7px;right:18px;
+    transform:rotate(45deg);
+    width:12px;height:12px;background:#fff;
+    border-right:1px solid rgba(0,0,0,0.08);
+    border-bottom:1px solid rgba(0,0,0,0.08);
+}
+.nc-hint b,.nc-hint strong{font-weight:700}
+.nc-hint i,.nc-hint em{font-style:italic}
+.nc-hint a{color:#2563eb;text-decoration:underline}
+
+/* === Messenger button tooltips === */
+.nc-btn[data-nc-tooltip]{position:relative}
+.nc-btn[data-nc-tooltip]::before{
+    content:attr(data-nc-tooltip);
+    position:absolute;right:calc(100% + 12px);top:50%;
+    transform:translateY(-50%) translateX(4px);
+    background:rgba(0,0,0,0.85);color:#fff;
+    padding:6px 12px;border-radius:8px;
+    font-size:12px;font-weight:600;white-space:nowrap;
+    opacity:0;visibility:hidden;pointer-events:none;
+    transition:all .2s ease;
+    z-index:20;
+}
+.nc-btn[data-nc-tooltip]::after{
+    content:'';position:absolute;
+    right:calc(100% + 6px);top:50%;
+    transform:translateY(-50%) translateX(4px);
+    border:5px solid transparent;
+    border-left-color:rgba(0,0,0,0.85);
+    opacity:0;visibility:hidden;
+    transition:all .2s ease;
+    z-index:20;
+}
+.nc-btn[data-nc-tooltip]:hover::before,
+.nc-btn[data-nc-tooltip]:hover::after{
+    opacity:1;visibility:visible;
+    transform:translateY(-50%) translateX(0);
+}
+
+/* Visibility controls */
+@media(max-width:768px){
+    #netchat.nc-hide-mobile{display:none!important}
+    /* Make buttons more touch-friendly on mobile */
+    .nc-btn{
+        min-width:48px;
+        min-height:48px;
+        cursor:pointer;
+        -webkit-tap-highlight-color:transparent;
+        touch-action:manipulation;
+    }
+    /* Ensure bubble is visible on mobile */
+    .nc-bubble{
+        pointer-events:auto !important;
+    }
+}
+@media(min-width:769px){#netchat.nc-hide-desktop{display:none!important}}
+#netchat.nc-hide-all{display:none!important}
+
+/* Mobile-specific optimizations */
+@media(max-width:480px){
+    #netchat{
+        bottom:16px !important;
+        right:16px !important;
+    }
+    .nc-col{
+        gap:8px;
+    }
+    .nc-btn{
+        width:52px !important;
+        height:52px !important;
+    }
+    .nc-bubble{
+        gap:8px !important;
+    }
+}
+
+/* Better touch interaction */
+.nc-btn{
+    -webkit-touch-callout:none;
+    -webkit-user-select:none;
+    user-select:none;
+    touch-action:manipulation;
+}
+
+/* Accessibility */
+@media(prefers-reduced-motion:reduce){
+    .nc-btn,.nc-bubble,.nc-hint{transition:none!important;animation:none!important}
+}
+@media print{#netchat{display:none!important}}
