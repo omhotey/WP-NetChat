@@ -28,6 +28,11 @@ NetChat — это лёгкий WordPress плагин без внешних з�
 
 ```
 JSON-файл (wp-content/netchat-data.json)
+```
+
+> Для корректной работы плагина папка `wp-content` должна быть доступна для записи.
+
+```
          ↓
   netchat_get_config()
          ↓

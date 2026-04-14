@@ -1,5 +1,7 @@
 .qwen/
 netchat-clean/
+netchat-wp.zip
+includes/
 *.log
 *.tmp
 Thumbs.db
