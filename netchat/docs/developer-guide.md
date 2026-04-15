@@ -63,7 +63,7 @@ netchat/
 │   │   ├── admin.css     # Стили админки WordPress
 │   │   └── style.css     # Стили виджета на фронтенде
 │   ├── js/
-│   │   ├── admin.js      # JS админки (SortableJS для drag-drop, REST API сохранение)
+│   │   ├── admin.js      # JS админки (REST API сохранение, валидация, управление каналами)
 │   │   └── front.js      # JS виджета (toggle меню, клавиатура)
 │   └── img/              # SVG иконки мессенджеров
 │       ├── TG.svg, WhatsUp.svg, VK.svg, Max.svg

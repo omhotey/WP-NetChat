@@ -28,7 +28,7 @@ netchat/
 │   │   ├── admin.css     # Стили админки (обновлены)
 │   │   └── style.css     # Стили фронтенд-виджета (обновлены)
 │   ├── js/
-│   │   ├── admin.js      # JS админки (SortableJS)
+│   │   ├── admin.js      # JS админки (REST API сохранение, валидация, управление каналами)
 │   │   └── front.js      # JS фронтенд-виджета
 │   └── img/              # 8 SVG иконок + 3 демо скриншота
 │       ├── TG.svg, WhatsUp.svg, VK.svg, Max.svg
