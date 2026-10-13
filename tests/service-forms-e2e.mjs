@@ -42,8 +42,15 @@ try{
  // Pending close/reopen regression: a delayed A request must not strand B.
  if(hosted)await saveConfig({...original,button_scroll_percent:25,hint_scroll_percent:50,hint:1,hint_text:'Synthetic pending greeting',hint_delay:0,leads:{...original.leads,email:{...original.leads.email,enabled:0}}});
  for(const outcome of ['success','error','timeout']){
+  if(hosted){
+   // The previous case crosses the threshold. Reset before the new page view;
+   // resetting after reload cannot undo legitimate sticky restored eligibility.
+   const previousScroll=await page.evaluate(()=>{const before=scrollY;history.scrollRestoration='manual';scrollTo(0,0);return before;});
+   await page.waitForFunction(()=>scrollY===0);
+   (evidence.regression_initial_scroll||(evidence.regression_initial_scroll=[])).push({outcome,previousScroll});
+  }
   await page.reload();await page.waitForFunction(()=>window.NetChatServiceForms);
-  if(hosted){await page.evaluate(()=>{document.body.style.height=(innerHeight+4000)+'px';scrollTo(0,0);});await page.waitForTimeout(80);assert.equal(await page.locator('#nc-toggle').isVisible(),false);}
+  if(hosted){await page.waitForTimeout(80);assert.equal(await page.evaluate(()=>scrollY),0,'new pending page view starts at zero before eligibility');assert.equal(await page.locator('#nc-toggle').isVisible(),false);}
   await page.evaluate(()=>NetChat.openForm({service_code:'TEST_G',cta_position:'hero'}));
   await required(forms.find(f=>f.service_code==='TEST_G'),1);await next();
   await input('contact.name').fill('Синтетический посетитель');await root.locator('[data-path="contact.channel"][value="email"]').check();await input('contact.value').fill('synthetic@example.test');await input('consent.accepted').check();
