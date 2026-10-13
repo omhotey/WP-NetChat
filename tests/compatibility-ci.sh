@@ -35,10 +35,36 @@ PY
 work=$(mktemp -d "${RUNNER_TEMP:?}/netchat-ci-XXXXXX")
 core="$work/core"
 server_pid=''
+browser_cron_isolation_verified='false'
 mkdir -p "$core" "$work/bin"
 cleanup() {
   status=$?
   trap - EXIT
+  # Aggregate only: never print request paths/queries, headers or raw server logs.
+  python3 - "$work" "$browser_cron_isolation_verified" <<'PY' || status=1
+import collections, json, pathlib, re, sys
+work = pathlib.Path(sys.argv[1])
+events = []
+trace = work / 'requests.ndjson'
+if trace.exists():
+    for line in trace.read_text(errors='replace').splitlines()[-20000:]:
+        try: events.append(json.loads(line))
+        except ValueError: pass
+started = collections.Counter(e['kind'] for e in events if e.get('event') == 'start')
+ended = [e for e in events if e.get('event') == 'end']
+finished = collections.Counter(e['kind'] for e in ended)
+server = work / 'server.log'
+raw = server.read_text(errors='replace')[-2000000:] if server.exists() else ''
+print('CI sanitized server summary ' + json.dumps({
+    'started': dict(started), 'finished': dict(finished),
+    'unfinished': {k: started[k]-finished[k] for k in started if started[k] != finished[k]},
+    'status_counts': dict(collections.Counter(str(e.get('status')) for e in ended)),
+    'max_elapsed_seconds': max([e.get('elapsed', 0) for e in ended] or [0]),
+    'cron_path_seen': bool(re.search(r'/wp-cron\.php(?:[?\s]|$)', raw)),
+    'fatal_count': raw.count('Fatal error'),
+    'browser_cron_isolation_verified': sys.argv[2] == 'true'
+}, sort_keys=True))
+PY
   if [[ -n "$server_pid" ]]; then kill "$server_pid" 2>/dev/null || true; wait "$server_pid" 2>/dev/null || true; fi
   if [[ -f "$core/wp-config.php" ]]; then
     if ! wp --path="$core" --skip-plugins --skip-themes db drop --yes >/dev/null; then status=1; fi
@@ -84,6 +110,10 @@ wp --path="$core" --skip-plugins --skip-themes eval 'global $wpdb; $tables=$wpdb
 # Every browser record/page below lives only in this disposable core/database.
 wp --path="$core" option update home http://localhost:8080
 wp --path="$core" option update siteurl http://localhost:8080
+# The single-process PHP7.2 server cannot concurrently handle cron loopback.
+# This applies ONLY to the disposable browser core, after unchanged SQL/smoke.
+wp --path="$core" config set DISABLE_WP_CRON true --raw
+echo 'CI browser core: automatic cron loopback disabled; scheduled workers checked/run explicitly.'
 wp --path="$core" plugin activate netchat
 wp --path="$core" user create netchat_subscriber subscriber@example.test --role=subscriber --user_pass=ci-disposable-only
 wp --path="$core" eval '
@@ -94,9 +124,17 @@ wp --path="$core" eval '
   $id=wp_insert_post(array("post_type"=>"page","post_status"=>"publish","post_name"=>"netchat-test","post_title"=>"Synthetic browser fixture","post_content"=>$content),true);if(is_wp_error($id))WP_CLI::error("Fixture page failed");
 '
 wp --path="$core" rewrite structure '/%postname%/'
+wp --path="$core" eval 'if(!defined("DISABLE_WP_CRON")||DISABLE_WP_CRON!==true)WP_CLI::error("Browser cron isolation readback failed");if(netchat_get_config()["leads"]["email"]["enabled"])WP_CLI::error("Synthetic worker mail must be disabled");foreach(array("netchat_leads_send_notifications","netchat_leads_retention_cleanup")as$hook)if(!wp_next_scheduled($hook))WP_CLI::error("Missing scheduled NetChat worker");echo "PASS CI-only cron flag, mail-off and actual scheduled workers readback\n";'
+browser_cron_isolation_verified='true'
+wp --path="$core" cron event run netchat_leads_send_notifications netchat_leads_retention_cleanup
+wp --path="$core" eval 'foreach(array("netchat_leads_send_notifications","netchat_leads_retention_cleanup")as$hook)if(!wp_next_scheduled($hook))WP_CLI::error("Worker was not rescheduled");echo "PASS scheduled NetChat workers remain after real explicit execution\n";'
 cat > "$work/router.php" <<'PHP'
 <?php
 $path=parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
+$kind=$path==='/wp-cron.php'?'cron':(strpos($path,'/wp-admin/')===0?'admin':(strpos($path,'/wp-json/')===0?'api':(preg_match('/\.(css|js|png|svg|woff2?)$/i',$path)?'asset':'page')));
+$started=microtime(true);$trace=__DIR__.'/requests.ndjson';
+file_put_contents($trace,json_encode(array('event'=>'start','kind'=>$kind))."\n",FILE_APPEND|LOCK_EX);
+register_shutdown_function(function()use($kind,$started,$trace){file_put_contents($trace,json_encode(array('event'=>'end','kind'=>$kind,'status'=>http_response_code(),'elapsed'=>round(microtime(true)-$started,3)))."\n",FILE_APPEND|LOCK_EX);});
 if(is_file($_SERVER['DOCUMENT_ROOT'].$path))return false;
 require $_SERVER['DOCUMENT_ROOT'].'/index.php';
 PHP
