@@ -4,7 +4,7 @@ if(!defined('WP_CLI')||!WP_CLI)exit(1);
 global $wpdb;
 $original_options=$wpdb->options;$original_prefix=$wpdb->prefix;$prefix='nc_form_life_'.bin2hex(random_bytes(5)).'_';
 $wpdb->query("CREATE TEMPORARY TABLE `{$prefix}options` LIKE `$original_options`");$wpdb->options=$prefix.'options';$wpdb->prefix=$prefix;wp_cache_flush();
-$fixture=tempnam(sdemo_get_temp_dir(),'ncf-life-');unlink($fixture);define('NETCHAT_DATA',$fixture);
+$fixture=tempnam(sys_get_temp_dir(),'ncf-life-');unlink($fixture);define('NETCHAT_DATA',$fixture);
 require dirname(__DIR__).'/netchat.php';
 require_once dirname(__DIR__).'/includes/service-forms-admin.php';
 $GLOBALS['life_checks']=0;
@@ -56,6 +56,6 @@ try{
     $preset['fields']=array_reverse($preset['fields']);$errors=array();$parsed=netchat_service_answers(array('stage'=>'prototype','idea'=>'Достаточно длинный ответ','next_result'=>'unknown','existing_work'=>'Тестовый вариант 4','product_url'=>'https://example.test/p'),$preset,$errors);life_assert(!$errors&&isset($parsed['existing_work'],$parsed['product_url']),'reordered conditions validate independently');
     WP_CLI::success($GLOBALS['life_checks'].' isolated form lifecycle assertions passed.');
 }finally{
-    foreach(array(netchat_leads_kedemo_table(),netchat_leads_limits_table(),netchat_leads_table())as$table){if(strpos($table,$prefix)!==0)throw new RuntimeException('Unsafe test cleanup');$wpdb->query("DROP TABLE IF EXISTS `$table`");}
+    foreach(array(netchat_leads_keys_table(),netchat_leads_limits_table(),netchat_leads_table())as$table){if(strpos($table,$prefix)!==0)throw new RuntimeException('Unsafe test cleanup');$wpdb->query("DROP TABLE IF EXISTS `$table`");}
     if(file_exists($fixture))unlink($fixture);$wpdb->options=$original_options;$wpdb->prefix=$original_prefix;wp_cache_flush();
 }

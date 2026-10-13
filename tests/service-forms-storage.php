@@ -7,7 +7,7 @@ $sf_original_options = $wpdb->options; $sf_original_prefix = $wpdb->prefix;
 $sf_prefix = 'nc_services_test_' . bin2hex( random_bytes( 5 ) ) . '_'; $sf_options = $sf_prefix . 'options';
 if ( false === $wpdb->query( "CREATE TEMPORARY TABLE `$sf_options` LIKE `$sf_original_options`" ) ) WP_CLI::error( 'Cannot create isolated options.' );
 $wpdb->options = $sf_options; $wpdb->prefix = $sf_prefix; wp_cache_flush();
-$sf_fixture = tempnam( sdemo_get_temp_dir(), 'ncs-json-' ); unlink( $sf_fixture ); define( 'NETCHAT_DATA', $sf_fixture );
+$sf_fixture = tempnam( sys_get_temp_dir(), 'ncs-json-' ); unlink( $sf_fixture ); define( 'NETCHAT_DATA', $sf_fixture );
 require dirname( __DIR__ ) . '/netchat.php';
 if ( ! function_exists( 'netchat_service_validate' ) ) require dirname( __DIR__ ) . '/includes/service-forms-validation.php';
 if ( ! function_exists( 'netchat_service_builtin' ) ) require dirname( __DIR__ ) . '/includes/service-forms.php';
@@ -180,24 +180,29 @@ try {
     $captured_service_mail = null;
     $capture_mail = function($atts)use(&$captured_service_mail){$captured_service_mail=$atts;return $atts;};
     $fixture_transport = function($mailer){$mailer->isSendmail();$mailer->Sendmail='/bin/true';};
+    $fixture_from = function(){return 'netchat-fixture@example.test';};
     $mail_cfg = netchat_get_config(); $mail_cfg['leads']['email']['enabled']=1; $mail_cfg['leads']['email']['include_message']=0; $mail_cfg['leads']['email']['recipients']=array('synthetic-owner@example.test');
     sf_assert(netchat_save_config($mail_cfg,netchat_get_revision())===true,'enable isolated service mail');
     $wpdb->update(netchat_leads_table(),array('notification_status'=>'pending','notification_next_attempt_at'=>null),array('id'=>$legacy_id));
-    add_filter('wp_mail',$capture_mail); add_action('phpmailer_init',$fixture_transport);
-    try { netchat_leads_send_one_notification($legacy_id); } finally { remove_filter('wp_mail',$capture_mail); remove_action('phpmailer_init',$fixture_transport); }
+    add_filter('wp_mail',$capture_mail); add_filter('wp_mail_from',$fixture_from); add_action('phpmailer_init',$fixture_transport);
+    try { netchat_leads_send_one_notification($legacy_id); } finally { remove_filter('wp_mail',$capture_mail); remove_filter('wp_mail_from',$fixture_from); remove_action('phpmailer_init',$fixture_transport); }
+    sf_assert(netchat_leads_get($legacy_id)['notification_status']==='sent','real service mail transport handoff');
     sf_assert(is_array($captured_service_mail) && strpos($captured_service_mail['message'],'ОТВЕТЫ НА ВОПРОСЫ')!==false && strpos($captured_service_mail['message'],'Пока не знаю')!==false,'real mail path includes service answers even with legacy message toggle off');
     sf_assert(strpos($captured_service_mail['subject'],$old['public_code'])!==false && strpos($captured_service_mail['message'],'Visitor+synthetic@example.test')!==false,'mail contains stable reference and contact');
     foreach ( array( '/netchat/v1/leads', '/netchat/v1/leads/' . $response_data['submission_id'] ) as $route ) sf_assert( rest_do_request( new WP_REST_Request( 'GET', $route ) )->get_status() !== 200, 'public GET cannot read service records' );
-    foreach ( netchat_service_builtin() as $schema ) foreach ( $schema['fields'] as $field ) {
+    $multi_checks = 0;
+    foreach ( json_decode(file_get_contents(__DIR__.'/fixtures-demo-forms.json'),true) as $schema ) foreach ( $schema['fields'] as $field ) {
         if ( 'multi' !== $field['type'] || ! isset( $field['options']['unknown'] ) ) continue;
         $data = sf_data( $schema['service_code'] ); $choices = array_keys( $field['options'] ); $data['answers'][$field['key']] = array( 'unknown', $choices[0] );
         sf_assert( sf_field_error( sf_validate( $data ), 'answers.' . $field['key'] ), 'every multi enforces unknown exclusivity: ' . $schema['service_code'] );
+        $multi_checks++;
     }
+    sf_assert($multi_checks===5,'all five synthetic multi exclusivity cases run');
     $data = sf_data( 'TEST_G' ); $data['context']['page_url'] = 'http://example.test/services'; sf_assert( sf_field_error( sf_validate( $data ), 'context.page_url' ), 'context requires current scheme' );
     $data['context']['page_url'] = 'https://example.test:444/services'; sf_assert( sf_field_error( sf_validate( $data ), 'context.page_url' ), 'context requires current port' );
     WP_CLI::success( $GLOBALS['sf_checks'] . ' isolated service validation/storage assertions passed.' );
 } finally {
-    foreach ( array( netchat_leads_kedemo_table(), netchat_leads_limits_table(), netchat_leads_table() ) as $table ) { if ( strpos( $table, $sf_prefix ) !== 0 ) throw new RuntimeException( 'Unsafe cleanup prefix.' ); $wpdb->query( "DROP TABLE IF EXISTS `$table`" ); }
+    foreach ( array( netchat_leads_keys_table(), netchat_leads_limits_table(), netchat_leads_table() ) as $table ) { if ( strpos( $table, $sf_prefix ) !== 0 ) throw new RuntimeException( 'Unsafe cleanup prefix.' ); $wpdb->query( "DROP TABLE IF EXISTS `$table`" ); }
     if ( file_exists( $sf_fixture ) ) unlink( $sf_fixture );
     $wpdb->options = $sf_original_options; $wpdb->prefix = $sf_original_prefix; wp_cache_flush();
 }

@@ -17,6 +17,7 @@ function ncl_payload($replace=array()){
 function ncl_save($c){ncl_assert(true===netchat_save_config($c,netchat_get_revision()),'isolated settings save');}
 function ncl_reset_rate(){global $wpdb;$wpdb->query('DELETE FROM '.netchat_leads_limits_table());}
 $created=0;$changed=0;$filtered=0;
+$fixture_from=function(){return 'netchat-fixture@example.test';};
 add_action('netchat_lead_created',function()use(&$created){$created++;},1);
 add_action('netchat_lead_status_changed',function()use(&$changed){$changed++;},1);
 add_filter('netchat_lead_data',function($row)use(&$filtered){$filtered++;return $row;},1);
@@ -48,6 +49,8 @@ try{
     ncl_reset_rate();$_SERVER['REMOTE_ADDR']='198.51.100.12';for($i=0;$i<5;$i++)ncl_assert(!is_wp_error(netchat_leads_create(ncl_payload())),'allowed submission');$limited=netchat_leads_create(ncl_payload());ncl_assert(is_wp_error($limited)&&$limited->get_error_data()['status']===429,'sixth submission limited');ncl_assert((int)$wpdb->get_var('SELECT COUNT(*) FROM '.netchat_leads_limits_table())<=2050,'bounded counters');
     ncl_reset_rate();$table=netchat_leads_table();$fault=function($sql)use($table){return strpos($sql,"INSERT INTO `$table` ")===0?'BROKEN SQL FOR TEST':$sql;};$suppressed=$wpdb->suppress_errors(true);add_filter('query',$fault);$failed=netchat_leads_create(ncl_payload());remove_filter('query',$fault);$wpdb->suppress_errors($suppressed);ncl_assert(is_wp_error($failed)&&$failed->get_error_data()['status']===503,'insert failure retryable');
     // Real wp_mail uses deterministic local sendmail fixtures; no external delivery.
+    // WP5 validates From before phpmailer_init; CLI SERVER_NAME may be empty.
+    add_filter('wp_mail_from',$fixture_from);
     $c['leads']['email']['enabled']=1;$c['leads']['email']['recipients']=array('owner@example.test');ncl_save($c);ncl_reset_rate();$queued=netchat_leads_create(ncl_payload());ncl_assert(!is_wp_error($queued),'pending notification saved');$qid=$queued['id'];
     $fail_mail=function($mailer){$mailer->isSendmail();$mailer->Sendmail='/bin/false';};add_action('phpmailer_init',$fail_mail);try{netchat_leads_send_one_notification($qid);}finally{remove_action('phpmailer_init',$fail_mail);}$mailrow=netchat_leads_get($qid);ncl_assert($mailrow['notification_status']==='pending'&&(int)$mailrow['notification_attempts']===1&&!empty($mailrow['notification_next_attempt_at']),'mail failure retains lead/backoff');
     $wpdb->update($table,array('notification_next_attempt_at'=>null),array('id'=>$qid));$mail_calls=0;$sent_mail=function($mailer)use(&$mail_calls){$mail_calls++;$mailer->isSendmail();$mailer->Sendmail='/bin/true';};add_action('phpmailer_init',$sent_mail);try{netchat_leads_send_one_notification($qid);netchat_leads_send_one_notification($qid);}finally{remove_action('phpmailer_init',$sent_mail);}ncl_assert(netchat_leads_get($qid)['notification_status']==='sent'&&$mail_calls===1,'successful handoff not repeated');
@@ -70,6 +73,7 @@ try{
     do_action('rest_api_init');wp_set_current_user(0);ncl_assert(rest_do_request(new WP_REST_Request('GET','/netchat/v1/leads/token'))->get_status()===403,'disabled token issuance');ncl_assert(rest_do_request(new WP_REST_Request('GET','/netchat/v1/leads/1'))->get_status()!==200,'no public lead reading');
     WP_CLI::success($GLOBALS['checks'].' isolated lead and mail/privacy assertions passed.');
 }finally{
+    remove_filter('wp_mail_from',$fixture_from);
     foreach(array(netchat_leads_keys_table(),netchat_leads_limits_table(),netchat_leads_table())as$table){if(strpos($table,$isolated)!==0)throw new RuntimeException('Unsafe fixture cleanup');$wpdb->query("DROP TABLE IF EXISTS `$table`");}
     if(file_exists($fixture))unlink($fixture);$wpdb->options=$original_options;$wpdb->prefix=$original_prefix;wp_cache_flush();
 }
