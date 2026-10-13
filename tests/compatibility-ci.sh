@@ -55,7 +55,7 @@ export PATH="$work/bin:$PATH"
 wp --version
 # Official ZIP preserves paths longer than tar's legacy 100-byte name field.
 # Exact core version and every official file checksum remain mandatory below.
-wp --path="$core" core download "https://wordpress.org/wordpress-${NETCHAT_WP_VERSION}.zip" --version="$NETCHAT_WP_VERSION" --locale=en_US
+wp --path="$core" core download "https://wordpress.org/wordpress-${NETCHAT_WP_VERSION}.zip"
 wp --path="$core" core verify-checksums --version="$NETCHAT_WP_VERSION" --locale=en_US
 [[ $(wp --path="$core" core version) == "$NETCHAT_WP_VERSION" ]] || { echo 'Core version mismatch' >&2; exit 1; }
 wp --path="$core" config create --dbname="$NETCHAT_DB_NAME" --dbuser="${NETCHAT_DB_USER:?}" --dbpass="${NETCHAT_DB_PASSWORD:?}" --dbhost="${NETCHAT_DB_HOST:?}" --dbprefix=nc_ci_ --skip-check
