@@ -1,0 +1,838 @@
+{
+  "demo_test_a_v1": {
+    "id": "demo_test_a_v1",
+    "service_code": "TEST_A",
+    "schema_version": 1,
+    "service_label": "Тестовая форма A",
+    "title": "Тестовая форма A",
+    "intro": "Синтетическая схема для проверки типов полей и условий.",
+    "submit_text": "Отправить тестовое обращение",
+    "success_text": "Тестовое обращение принято.",
+    "fields": [
+      {
+        "key": "stage",
+        "label": "Тестовый вопрос 1",
+        "type": "radio",
+        "required": true,
+        "step": 1,
+        "options": {
+          "idea": "Тестовый вариант 1",
+          "research": "Тестовый вариант 2",
+          "concept": "Тестовый вариант 3",
+          "prototype": "Тестовый вариант 4",
+          "development": "Тестовый вариант 5"
+        }
+      },
+      {
+        "key": "idea",
+        "label": "Тестовый вопрос 2",
+        "type": "text",
+        "required": true,
+        "step": 1,
+        "placeholder": "Синтетический ответ"
+      },
+      {
+        "key": "audience",
+        "label": "Тестовый вопрос 3",
+        "type": "short",
+        "required": false,
+        "step": 1,
+        "placeholder": "Синтетический ответ"
+      },
+      {
+        "key": "next_result",
+        "label": "Тестовый вопрос 4",
+        "type": "radio",
+        "required": true,
+        "step": 1,
+        "options": {
+          "validate": "Тестовый вариант 1",
+          "concept": "Тестовый вариант 2",
+          "scope": "Тестовый вариант 3",
+          "launch": "Тестовый вариант 4",
+          "unknown": "Пока не знаю"
+        }
+      },
+      {
+        "key": "existing_work",
+        "label": "Тестовый вопрос 5",
+        "type": "text",
+        "required": false,
+        "step": 2,
+        "placeholder": "Синтетический ответ",
+        "condition": {
+          "key": "stage",
+          "values": [
+            "research",
+            "concept",
+            "prototype",
+            "development"
+          ]
+        }
+      },
+      {
+        "key": "product_url",
+        "label": "Тестовый вопрос 6",
+        "type": "url",
+        "required": false,
+        "step": 2,
+        "placeholder": "https://example.test",
+        "condition": {
+          "key": "stage",
+          "values": [
+            "prototype",
+            "development"
+          ]
+        }
+      },
+      {
+        "key": "team_state",
+        "label": "Тестовый вопрос 7",
+        "type": "radio",
+        "required": false,
+        "step": 2,
+        "options": {
+          "own": "Тестовый вариант 1",
+          "contractor": "Тестовый вариант 2",
+          "partial": "Тестовый вариант 3",
+          "none": "Тестовый вариант 4",
+          "unknown": "Пока не знаю"
+        }
+      },
+      {
+        "key": "constraints",
+        "label": "Тестовый вопрос 8",
+        "type": "text",
+        "required": false,
+        "step": 2,
+        "placeholder": "Синтетический ответ",
+        "helper": "Подсказка тестового вопроса"
+      },
+      {
+        "key": "start_window",
+        "label": "Тестовый вопрос 9",
+        "type": "radio",
+        "required": false,
+        "step": 2,
+        "options": {
+          "soon": "Тестовый вариант 1",
+          "month": "Тестовый вариант 2",
+          "later": "Тестовый вариант 3",
+          "exploring": "Тестовый вариант 4"
+        }
+      }
+    ],
+    "notices": [],
+    "question_steps": 2
+  },
+  "demo_test_b_v1": {
+    "id": "demo_test_b_v1",
+    "service_code": "TEST_B",
+    "schema_version": 1,
+    "service_label": "Тестовая форма B",
+    "title": "Тестовая форма B",
+    "intro": "Синтетическая схема для проверки типов полей и условий.",
+    "submit_text": "Отправить тестовое обращение",
+    "success_text": "Тестовое обращение принято.",
+    "fields": [
+      {
+        "key": "product",
+        "label": "Тестовый вопрос 1",
+        "type": "text",
+        "required": true,
+        "step": 1,
+        "placeholder": "Синтетический ответ"
+      },
+      {
+        "key": "growth_focus",
+        "label": "Тестовый вопрос 2",
+        "type": "multi",
+        "required": true,
+        "step": 1,
+        "options": {
+          "acquisition": "Тестовый вариант 1",
+          "activation": "Тестовый вариант 2",
+          "retention": "Тестовый вариант 3",
+          "monetization": "Тестовый вариант 4",
+          "sales": "Тестовый вариант 5",
+          "delivery": "Тестовый вариант 6",
+          "unknown": "Пока не знаю"
+        }
+      },
+      {
+        "key": "current_situation",
+        "label": "Тестовый вопрос 3",
+        "type": "text",
+        "required": true,
+        "step": 1,
+        "placeholder": "Синтетический ответ"
+      },
+      {
+        "key": "product_url",
+        "label": "Тестовый вопрос 4",
+        "type": "url",
+        "required": false,
+        "step": 2,
+        "placeholder": "https://example.test"
+      },
+      {
+        "key": "data_state",
+        "label": "Тестовый вопрос 5",
+        "type": "radio",
+        "required": true,
+        "step": 2,
+        "options": {
+          "available": "Тестовый вариант 1",
+          "partial": "Тестовый вариант 2",
+          "none": "Тестовый вариант 3",
+          "unknown": "Пока не знаю"
+        }
+      },
+      {
+        "key": "known_metrics",
+        "label": "Тестовый вопрос 6",
+        "type": "text",
+        "required": false,
+        "step": 2,
+        "placeholder": "Синтетический ответ",
+        "helper": "Подсказка тестового вопроса",
+        "condition": {
+          "key": "data_state",
+          "values": [
+            "available",
+            "partial"
+          ]
+        }
+      },
+      {
+        "key": "monetization_model",
+        "label": "Тестовый вопрос 7",
+        "type": "short",
+        "required": false,
+        "step": 2,
+        "placeholder": "Синтетический ответ",
+        "condition": {
+          "key": "growth_focus",
+          "values": [
+            "monetization"
+          ]
+        }
+      },
+      {
+        "key": "attempted_changes",
+        "label": "Тестовый вопрос 8",
+        "type": "text",
+        "required": false,
+        "step": 2,
+        "placeholder": "Синтетический ответ"
+      },
+      {
+        "key": "start_window",
+        "label": "Тестовый вопрос 9",
+        "type": "radio",
+        "required": false,
+        "step": 2,
+        "options": {
+          "soon": "Тестовый вариант 1",
+          "month": "Тестовый вариант 2",
+          "later": "Тестовый вариант 3",
+          "exploring": "Тестовый вариант 4"
+        }
+      }
+    ],
+    "notices": [],
+    "question_steps": 2
+  },
+  "demo_test_c_v1": {
+    "id": "demo_test_c_v1",
+    "service_code": "TEST_C",
+    "schema_version": 1,
+    "service_label": "Тестовая форма C",
+    "title": "Тестовая форма C",
+    "intro": "Синтетическая схема для проверки типов полей и условий.",
+    "submit_text": "Отправить тестовое обращение",
+    "success_text": "Тестовое обращение принято.",
+    "fields": [
+      {
+        "key": "process",
+        "label": "Тестовый вопрос 1",
+        "type": "text",
+        "required": true,
+        "step": 1,
+        "placeholder": "Синтетический ответ"
+      },
+      {
+        "key": "pain_points",
+        "label": "Тестовый вопрос 2",
+        "type": "multi",
+        "required": true,
+        "step": 1,
+        "options": {
+          "manual": "Тестовый вариант 1",
+          "errors": "Тестовый вариант 2",
+          "fragmented": "Тестовый вариант 3",
+          "visibility": "Тестовый вариант 4",
+          "slow": "Тестовый вариант 5",
+          "adoption": "Тестовый вариант 6",
+          "unknown": "Пока не знаю"
+        }
+      },
+      {
+        "key": "desired_result",
+        "label": "Тестовый вопрос 3",
+        "type": "text",
+        "required": true,
+        "step": 1,
+        "placeholder": "Синтетический ответ"
+      },
+      {
+        "key": "systems_state",
+        "label": "Тестовый вопрос 4",
+        "type": "radio",
+        "required": true,
+        "step": 2,
+        "options": {
+          "yes": "Тестовый вариант 1",
+          "partial": "Тестовый вариант 2",
+          "no": "Тестовый вариант 3",
+          "unknown": "Пока не знаю"
+        }
+      },
+      {
+        "key": "systems",
+        "label": "Тестовый вопрос 5",
+        "type": "text",
+        "required": false,
+        "step": 2,
+        "placeholder": "Синтетический ответ",
+        "helper": "Подсказка тестового вопроса",
+        "condition": {
+          "key": "systems_state",
+          "values": [
+            "yes",
+            "partial"
+          ]
+        }
+      },
+      {
+        "key": "integration_need",
+        "label": "Тестовый вопрос 6",
+        "type": "radio",
+        "required": false,
+        "step": 2,
+        "options": {
+          "yes": "Тестовый вариант 1",
+          "no": "Тестовый вариант 2",
+          "unknown": "Пока не знаю"
+        },
+        "condition": {
+          "key": "systems_state",
+          "values": [
+            "yes",
+            "partial"
+          ]
+        }
+      },
+      {
+        "key": "participants",
+        "label": "Тестовый вопрос 7",
+        "type": "short",
+        "required": false,
+        "step": 2,
+        "placeholder": "Синтетический ответ",
+        "helper": "Подсказка тестового вопроса"
+      },
+      {
+        "key": "solution_state",
+        "label": "Тестовый вопрос 8",
+        "type": "radio",
+        "required": false,
+        "step": 2,
+        "options": {
+          "not_selected": "Тестовый вариант 1",
+          "ready": "Тестовый вариант 2",
+          "existing": "Тестовый вариант 3",
+          "custom": "Тестовый вариант 4",
+          "compare": "Тестовый вариант 5"
+        }
+      },
+      {
+        "key": "start_window",
+        "label": "Тестовый вопрос 9",
+        "type": "radio",
+        "required": false,
+        "step": 2,
+        "options": {
+          "soon": "Тестовый вариант 1",
+          "month": "Тестовый вариант 2",
+          "later": "Тестовый вариант 3",
+          "exploring": "Тестовый вариант 4"
+        }
+      }
+    ],
+    "notices": [],
+    "question_steps": 2
+  },
+  "demo_test_d_v1": {
+    "id": "demo_test_d_v1",
+    "service_code": "TEST_D",
+    "schema_version": 1,
+    "service_label": "Тестовая форма D",
+    "title": "Тестовая форма D",
+    "intro": "Синтетическая схема для проверки типов полей и условий.",
+    "submit_text": "Отправить тестовое обращение",
+    "success_text": "Тестовое обращение принято.",
+    "fields": [
+      {
+        "key": "project",
+        "label": "Тестовый вопрос 1",
+        "type": "text",
+        "required": true,
+        "step": 1,
+        "placeholder": "Синтетический ответ"
+      },
+      {
+        "key": "problems",
+        "label": "Тестовый вопрос 2",
+        "type": "multi",
+        "required": true,
+        "step": 1,
+        "options": {
+          "delays": "Тестовый вариант 1",
+          "costs": "Тестовый вариант 2",
+          "quality": "Тестовый вариант 3",
+          "value": "Тестовый вариант 4",
+          "alignment": "Тестовый вариант 5",
+          "handover": "Тестовый вариант 6",
+          "stalled": "Тестовый вариант 7",
+          "unknown": "Пока не знаю"
+        }
+      },
+      {
+        "key": "situation",
+        "label": "Тестовый вопрос 3",
+        "type": "text",
+        "required": true,
+        "step": 1,
+        "placeholder": "Синтетический ответ"
+      },
+      {
+        "key": "urgency",
+        "label": "Тестовый вопрос 4",
+        "type": "radio",
+        "required": true,
+        "step": 1,
+        "options": {
+          "critical": "Тестовый вариант 1",
+          "weeks": "Тестовый вариант 2",
+          "planned": "Тестовый вариант 3",
+          "unknown": "Пока не знаю"
+        }
+      },
+      {
+        "key": "critical_impact",
+        "label": "Тестовый вопрос 5",
+        "type": "text",
+        "required": true,
+        "step": 2,
+        "placeholder": "Синтетический ответ",
+        "helper": "Подсказка тестового вопроса",
+        "condition": {
+          "key": "urgency",
+          "values": [
+            "critical"
+          ]
+        }
+      },
+      {
+        "key": "desired_decision",
+        "label": "Тестовый вопрос 6",
+        "type": "text",
+        "required": false,
+        "step": 2,
+        "placeholder": "Синтетический ответ"
+      },
+      {
+        "key": "access_state",
+        "label": "Тестовый вопрос 7",
+        "type": "radio",
+        "required": false,
+        "step": 2,
+        "options": {
+          "yes": "Тестовый вариант 1",
+          "partial": "Тестовый вариант 2",
+          "no": "Тестовый вариант 3",
+          "unknown": "Пока не знаю"
+        },
+        "helper": "Подсказка тестового вопроса"
+      },
+      {
+        "key": "project_url",
+        "label": "Тестовый вопрос 8",
+        "type": "url",
+        "required": false,
+        "step": 2,
+        "placeholder": "https://example.test"
+      },
+      {
+        "key": "start_window",
+        "label": "Тестовый вопрос 9",
+        "type": "radio",
+        "required": false,
+        "step": 2,
+        "options": {
+          "soon": "Тестовый вариант 1",
+          "month": "Тестовый вариант 2",
+          "later": "Тестовый вариант 3",
+          "exploring": "Тестовый вариант 4"
+        }
+      }
+    ],
+    "notices": [
+      {
+        "text": "Синтетическое сообщение для проверки условия.",
+        "condition": {
+          "key": "urgency",
+          "values": [
+            "critical"
+          ]
+        },
+        "channel_link": true
+      }
+    ],
+    "question_steps": 2
+  },
+  "demo_test_e_v1": {
+    "id": "demo_test_e_v1",
+    "service_code": "TEST_E",
+    "schema_version": 1,
+    "service_label": "Тестовая форма E",
+    "title": "Тестовая форма E",
+    "intro": "Синтетическая схема для проверки типов полей и условий.",
+    "submit_text": "Отправить тестовое обращение",
+    "success_text": "Тестовое обращение принято.",
+    "fields": [
+      {
+        "key": "product",
+        "label": "Тестовый вопрос 1",
+        "type": "text",
+        "required": true,
+        "step": 1,
+        "placeholder": "Синтетический ответ"
+      },
+      {
+        "key": "lead_need",
+        "label": "Тестовый вопрос 2",
+        "type": "multi",
+        "required": true,
+        "step": 1,
+        "options": {
+          "ownership": "Тестовый вариант 1",
+          "priorities": "Тестовый вариант 2",
+          "coordination": "Тестовый вариант 3",
+          "delivery": "Тестовый вариант 4",
+          "team": "Тестовый вариант 5",
+          "transition": "Тестовый вариант 6",
+          "unknown": "Пока не знаю"
+        }
+      },
+      {
+        "key": "expected_result",
+        "label": "Тестовый вопрос 3",
+        "type": "text",
+        "required": true,
+        "step": 1,
+        "placeholder": "Синтетический ответ"
+      },
+      {
+        "key": "team_state",
+        "label": "Тестовый вопрос 4",
+        "type": "radio",
+        "required": true,
+        "step": 2,
+        "options": {
+          "own": "Тестовый вариант 1",
+          "external": "Тестовый вариант 2",
+          "mixed": "Тестовый вариант 3",
+          "forming": "Тестовый вариант 4",
+          "none": "Тестовый вариант 5"
+        }
+      },
+      {
+        "key": "team_context",
+        "label": "Тестовый вопрос 5",
+        "type": "text",
+        "required": false,
+        "step": 2,
+        "placeholder": "Синтетический ответ",
+        "condition": {
+          "key": "team_state",
+          "values": [
+            "own",
+            "external",
+            "mixed",
+            "forming"
+          ]
+        }
+      },
+      {
+        "key": "participation",
+        "label": "Тестовый вопрос 6",
+        "type": "radio",
+        "required": false,
+        "step": 2,
+        "options": {
+          "stage": "Тестовый вариант 1",
+          "ongoing": "Тестовый вариант 2",
+          "transition": "Тестовый вариант 3",
+          "advisory": "Тестовый вариант 4",
+          "unknown": "Пока не знаю"
+        }
+      },
+      {
+        "key": "authority",
+        "label": "Тестовый вопрос 7",
+        "type": "radio",
+        "required": true,
+        "step": 2,
+        "options": {
+          "yes": "Тестовый вариант 1",
+          "partial": "Тестовый вариант 2",
+          "no": "Тестовый вариант 3",
+          "discuss": "Тестовый вариант 4"
+        }
+      },
+      {
+        "key": "authority_limits",
+        "label": "Тестовый вопрос 8",
+        "type": "text",
+        "required": false,
+        "step": 2,
+        "placeholder": "Синтетический ответ",
+        "condition": {
+          "key": "authority",
+          "values": [
+            "partial"
+          ]
+        }
+      },
+      {
+        "key": "start_window",
+        "label": "Тестовый вопрос 9",
+        "type": "radio",
+        "required": false,
+        "step": 2,
+        "options": {
+          "soon": "Тестовый вариант 1",
+          "month": "Тестовый вариант 2",
+          "later": "Тестовый вариант 3",
+          "exploring": "Тестовый вариант 4"
+        }
+      }
+    ],
+    "notices": [
+      {
+        "text": "Синтетическое сообщение для проверки условия.",
+        "any": [
+          {
+            "key": "authority",
+            "values": [
+              "no"
+            ]
+          },
+          {
+            "key": "participation",
+            "values": [
+              "advisory"
+            ]
+          }
+        ]
+      }
+    ],
+    "question_steps": 2
+  },
+  "demo_test_f_v1": {
+    "id": "demo_test_f_v1",
+    "service_code": "TEST_F",
+    "schema_version": 1,
+    "service_label": "Тестовая форма F",
+    "title": "Тестовая форма F",
+    "intro": "Синтетическая схема для проверки типов полей и условий.",
+    "submit_text": "Отправить тестовое обращение",
+    "success_text": "Тестовое обращение принято.",
+    "fields": [
+      {
+        "key": "audit_object",
+        "label": "Тестовый вопрос 1",
+        "type": "radio",
+        "required": true,
+        "step": 1,
+        "options": {
+          "concept": "Тестовый вариант 1",
+          "product": "Тестовый вариант 2",
+          "development": "Тестовый вариант 3",
+          "plan": "Тестовый вариант 4",
+          "system": "Тестовый вариант 5",
+          "unknown": "Пока не знаю"
+        }
+      },
+      {
+        "key": "object_description",
+        "label": "Тестовый вопрос 2",
+        "type": "text",
+        "required": true,
+        "step": 1,
+        "placeholder": "Синтетический ответ"
+      },
+      {
+        "key": "audit_questions",
+        "label": "Тестовый вопрос 3",
+        "type": "text",
+        "required": true,
+        "step": 1,
+        "placeholder": "Синтетический ответ"
+      },
+      {
+        "key": "decision",
+        "label": "Тестовый вопрос 4",
+        "type": "text",
+        "required": true,
+        "step": 1,
+        "placeholder": "Синтетический ответ"
+      },
+      {
+        "key": "materials_state",
+        "label": "Тестовый вопрос 5",
+        "type": "multi",
+        "required": false,
+        "step": 2,
+        "options": {
+          "research": "Тестовый вариант 1",
+          "requirements": "Тестовый вариант 2",
+          "metrics": "Тестовый вариант 3",
+          "prototype": "Тестовый вариант 4",
+          "technical": "Тестовый вариант 5",
+          "participants": "Тестовый вариант 6",
+          "unknown": "Пока не знаю"
+        }
+      },
+      {
+        "key": "materials_url",
+        "label": "Тестовый вопрос 6",
+        "type": "url",
+        "required": false,
+        "step": 2,
+        "placeholder": "https://example.test",
+        "helper": "Подсказка тестового вопроса",
+        "condition": {
+          "key": "materials_state",
+          "values": [
+            "research",
+            "requirements",
+            "metrics",
+            "prototype",
+            "technical"
+          ]
+        }
+      },
+      {
+        "key": "decision_window",
+        "label": "Тестовый вопрос 7",
+        "type": "radio",
+        "required": false,
+        "step": 2,
+        "options": {
+          "weeks": "Тестовый вариант 1",
+          "month": "Тестовый вариант 2",
+          "later": "Тестовый вариант 3",
+          "unknown": "Пока не знаю"
+        }
+      },
+      {
+        "key": "start_window",
+        "label": "Тестовый вопрос 8",
+        "type": "radio",
+        "required": false,
+        "step": 2,
+        "options": {
+          "soon": "Тестовый вариант 1",
+          "month": "Тестовый вариант 2",
+          "later": "Тестовый вариант 3",
+          "exploring": "Тестовый вариант 4"
+        }
+      }
+    ],
+    "notices": [
+      {
+        "text": "Синтетическое сообщение для проверки условия.",
+        "before_contact": true
+      }
+    ],
+    "question_steps": 2
+  },
+  "demo_test_g_v1": {
+    "id": "demo_test_g_v1",
+    "service_code": "TEST_G",
+    "schema_version": 1,
+    "service_label": "Тестовая форма G",
+    "title": "Тестовая форма G",
+    "intro": "Синтетическая схема для проверки типов полей и условий.",
+    "submit_text": "Отправить тестовое обращение",
+    "success_text": "Тестовое обращение принято.",
+    "fields": [
+      {
+        "key": "question",
+        "label": "Тестовый вопрос 1",
+        "type": "text",
+        "required": true,
+        "step": 1,
+        "placeholder": "Синтетический ответ"
+      },
+      {
+        "key": "context",
+        "label": "Тестовый вопрос 2",
+        "type": "text",
+        "required": false,
+        "step": 1,
+        "placeholder": "Синтетический ответ"
+      },
+      {
+        "key": "has_options",
+        "label": "Тестовый вопрос 3",
+        "type": "radio",
+        "required": true,
+        "step": 1,
+        "options": {
+          "yes": "Тестовый вариант 1",
+          "no": "Тестовый вариант 2",
+          "unknown": "Пока не знаю"
+        }
+      },
+      {
+        "key": "options",
+        "label": "Тестовый вопрос 4",
+        "type": "text",
+        "required": true,
+        "step": 1,
+        "placeholder": "Синтетический ответ",
+        "condition": {
+          "key": "has_options",
+          "values": [
+            "yes"
+          ]
+        }
+      },
+      {
+        "key": "materials_url",
+        "label": "Тестовый вопрос 5",
+        "type": "url",
+        "required": false,
+        "step": 1,
+        "placeholder": "https://example.test",
+        "helper": "Подсказка тестового вопроса"
+      }
+    ],
+    "notices": [],
+    "question_steps": 1
+  }
+}

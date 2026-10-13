@@ -1,0 +1,72 @@
+<?php
+/** Real WP/SQL transaction fixtures; never uses production options or lead rows. */
+if(!defined('WP_CLI')||!WP_CLI)exit(1);
+global $wpdb;$original=$wpdb->options;$table='nc_transfer_'.bin2hex(random_bytes(6)).'_options';
+if($wpdb->query("CREATE TABLE `$table` LIKE `$original`")===false)WP_CLI::error('Cannot allocate transfer fixture');
+$wpdb->options=$table;wp_cache_flush();$GLOBALS['nc_transfer_checks']=0;
+$json_fixture=tempnam(sys_get_temp_dir(),'nc-transfer-json-');unlink($json_fixture);define('NETCHAT_DATA',$json_fixture);
+function transfer_assert($ok,$label){if(!$ok)throw new RuntimeException($label);$GLOBALS['nc_transfer_checks']++;}
+try{
+    require dirname(__DIR__).'/netchat.php';netchat_get_config(true);netchat_service_initialize();
+    $cfg=netchat_service_forms_config();transfer_assert(count($cfg['installed'])===2&&$cfg['primary_form']==='nc_primary_v1'&&!$cfg['enabled'],'fresh two neutral defaults off');
+    $bundle=netchat_transfer_export('bundle');transfer_assert(!is_wp_error($bundle),'bundle export');
+    foreach(array('bindings','deleted')as$key)transfer_assert(!array_key_exists($key,$bundle['forms']),'forms exclude '.$key);
+    transfer_assert(!array_key_exists('revision',$bundle['settings']),'settings exclude revision');transfer_assert(!array_key_exists('leads',$bundle),'envelope excludes submission rows');
+    foreach(array('settings','forms')as$type){$extra=$bundle;$extra['type']=$type;$extra[$type==='settings'?'forms':'settings']=null;transfer_assert(is_wp_error(netchat_transfer_decode(wp_json_encode($extra))),'forbidden null branch '.$type);}
+    foreach(array('forms','bundle','settings')as$type)foreach(array('settings','forms')as$key){if(($type==='forms'&&$key==='settings')||($type==='settings'&&$key==='forms'))continue;$bad=$bundle;$bad['type']=$type;if($type!=='bundle')unset($bad[$type==='forms'?'settings':'forms']);$bad[$key]=null;transfer_assert(is_wp_error(netchat_transfer_decode(wp_json_encode($bad))),'required null branch '.$type.'.'.$key);}
+    $legacy_settings=netchat_storage_read();unset($legacy_settings['config']['button_scroll_percent'],$legacy_settings['config']['hint_scroll_percent']);update_option(NETCHAT_SETTINGS_OPTION,$legacy_settings,false);netchat_clear_cache();
+    $raw_legacy=$wpdb->get_var("SELECT option_value FROM `$table` WHERE option_name='netchat_settings'");
+    $portable=netchat_transfer_export('settings');transfer_assert($portable['settings']['button_scroll_percent']===0&&$portable['settings']['hint_scroll_percent']===0,'legacy export normalized percentages');
+    transfer_assert($wpdb->get_var("SELECT option_value FROM `$table` WHERE option_name='netchat_settings'")===$raw_legacy&&netchat_storage_read()['revision']===$legacy_settings['revision'],'export retains raw bytes/revision');
+    $older=$portable;unset($older['settings']['button_scroll_percent'],$older['settings']['hint_scroll_percent']);$old_decoded=netchat_transfer_decode(wp_json_encode($older));transfer_assert(!is_wp_error($old_decoded)&&$old_decoded['settings']===$portable['settings'],'older JSON gets zero and retains other values');
+    foreach(array('button_scroll_percent','hint_scroll_percent')as$key)foreach(array(null,true,25.5,-1,101,'bad',array())as$value){$invalid=$portable;$invalid['settings'][$key]=$value;transfer_assert(is_wp_error(netchat_transfer_decode(wp_json_encode($invalid))),'invalid imported percentage '.$key);}
+    $portable['settings']['button_scroll_percent']=25;$portable['settings']['hint_scroll_percent']=50;$settings_choices=array('selected'=>array(),'replace'=>array(),'apply_settings'=>true,'apply_documents'=>false,'set_primary'=>false);$portable_json=wp_json_encode($portable);$p=netchat_transfer_preview($portable_json,$settings_choices);transfer_assert(!is_wp_error($p),'legacy raw CAS preview');$r=netchat_transfer_apply($portable_json,$settings_choices,array_intersect_key($p,array_flip(array('digest','ticket','settings_revision','forms_revision'))));transfer_assert(!is_wp_error($r)&&netchat_get_config(true)['hint_scroll_percent']===50,'legacy raw CAS apply');
+    $bundle['settings']['size']=58;$bundle['settings']['button_scroll_percent']=25;$bundle['settings']['hint_scroll_percent']=50;$bundle['forms']['documents']['policy_url']='https://example.test/portable-policy';
+    $json=wp_json_encode($bundle);$decoded=netchat_transfer_decode($json);transfer_assert($decoded===$bundle,'portable roundtrip');
+    $selected=array_keys($bundle['forms']['installed']);$choices=array('selected'=>$selected,'replace'=>array(),'apply_settings'=>true,'apply_documents'=>true,'set_primary'=>true);
+    $preview=netchat_transfer_preview($json,$choices);transfer_assert(!is_wp_error($preview),'preview');
+    transfer_assert(count(netchat_service_forms_config()['installed'])===2,'preview does not write');
+    $proof=array_intersect_key($preview,array_flip(array('digest','ticket','settings_revision','forms_revision')));
+    $saved=netchat_transfer_apply($json,$choices,$proof);transfer_assert(!is_wp_error($saved),'atomic bundle');
+    $after=netchat_service_forms_config();transfer_assert(count($after['installed'])===4&&$after['primary_form']===$saved['mapping']['nc_primary_v1'],'copy and unique main');
+    transfer_assert(netchat_storage_read()['config']['size']===58&&$after['documents']['policy_url']==='https://example.test/portable-policy','bundle applies both settings and documents');
+    transfer_assert(netchat_get_config(true)['button_scroll_percent']===25&&netchat_get_config()['hint_scroll_percent']===50,'bundle retains independent percentages');
+    transfer_assert($after['installed'][$saved['mapping']['nc_primary_v1']]['question_steps']===1,'clone one-step remains one-step');
+    transfer_assert(is_wp_error(netchat_transfer_apply($json,$choices,$proof)),'stale proof rejected');
+    $p=netchat_transfer_preview($json,$choices);$stale=array_intersect_key($p,array_flip(array('digest','ticket','settings_revision','forms_revision')));$c=netchat_get_config(true);$c['size']=59;transfer_assert(netchat_save_config($c,netchat_get_revision())===true,'concurrent settings fixture');$conflict=netchat_transfer_apply($json,$choices,$stale);transfer_assert(is_wp_error($conflict)&&$conflict->get_error_data()['status']===409,'settings revision conflict rejects without apply');
+    $legacy=$bundle;$legacy['type']='forms';unset($legacy['settings']);$legacy['forms']['installed']=array('nc_primary_v1'=>$bundle['forms']['installed']['nc_primary_v1']);unset($legacy['forms']['installed']['nc_primary_v1']['question_steps']);
+    $one=netchat_transfer_decode(wp_json_encode($legacy));transfer_assert($one['forms']['installed']['nc_primary_v1']['question_steps']===1,'legacy one-step canonicalized');
+    $single=array('selected'=>array('nc_primary_v1'),'replace'=>array(),'apply_settings'=>false,'apply_documents'=>false,'set_primary'=>false);
+    $p=netchat_transfer_preview(wp_json_encode($legacy),$single);$r=netchat_transfer_apply(wp_json_encode($legacy),$single,array_intersect_key($p,array_flip(array('digest','ticket','settings_revision','forms_revision'))));transfer_assert(!is_wp_error($r)&&netchat_service_forms_config()['installed'][$r['mapping']['nc_primary_v1']]['question_steps']===1,'legacy copy keeps contact-last single step');
+    transfer_assert(netchat_get_config(true)['button_scroll_percent']===25&&netchat_get_config()['hint_scroll_percent']===50,'form-only import preserves percentages');
+    $explicit=$single;$explicit['replace']=array('nc_primary_v1'=>'nc_primary_v1');$old=netchat_service_forms_config()['installed']['nc_primary_v1'];
+    $p=netchat_transfer_preview($json,$explicit);$r=netchat_transfer_apply($json,$explicit,array_intersect_key($p,array_flip(array('digest','ticket','settings_revision','forms_revision'))));$new=netchat_service_forms_config()['installed']['nc_primary_v1'];transfer_assert(!is_wp_error($r)&&$new['id']===$old['id']&&$new['service_code']===$old['service_code']&&$new['schema_version']===$old['schema_version']+1,'explicit replace identity/version');
+    $registry=netchat_service_forms_config();$registry['bindings']=array('PRIMARY'=>array('url'=>'https://example.test/private','page_id'=>918));$registry['deleted']=array('private_history'=>array('schema_version'=>9));update_option('netchat_service_forms',$registry,false);
+    $export=netchat_transfer_export('forms');foreach(array('bindings','deleted')as$key)transfer_assert(!array_key_exists($key,$export['forms']),'no page IDs/history export '.$key);
+    $fixture=json_decode(file_get_contents(__DIR__.'/fixtures-demo-forms.json'),true);foreach($fixture as$form){$v=netchat_transfer_schema($form);transfer_assert(!is_wp_error($v)&&$v['fields']===$form['fields']&&$v['notices']===$form['notices'],'synthetic field/condition/notice roundtrip');}
+    $bad=$bundle;$bad['schema_version']=2;transfer_assert(is_wp_error(netchat_transfer_decode(wp_json_encode($bad))),'unsupported schema');
+    foreach(array('leads','auth','revision','sessions','bindings')as$key){$bad=$bundle;$bad[$key]=array();transfer_assert(is_wp_error(netchat_transfer_decode(wp_json_encode($bad))),'unknown envelope key '.$key);}
+    $bad=$bundle;$bad['forms']['installed']['nc_primary_v1']['fields'][0]['type']='php';transfer_assert(is_wp_error(netchat_transfer_decode(wp_json_encode($bad))),'unknown type');
+    $bad=$bundle;$bad['forms']['documents']['policy_url']='javascript:alert(1)';transfer_assert(is_wp_error(netchat_transfer_decode(wp_json_encode($bad))),'unsafe URL');
+    $bad=$bundle;$bad['forms']['installed']['nc_primary_v1']['fields'][0]['condition']=array('key'=>'missing','values'=>array('x'));transfer_assert(is_wp_error(netchat_transfer_decode(wp_json_encode($bad))),'bad dependency');
+    foreach(array(null,'broken',array(null),array('broken'),array(array('step'=>null)))as$fields){$bad=$bundle;unset($bad['forms']['installed']['nc_primary_v1']['question_steps']);$bad['forms']['installed']['nc_primary_v1']['fields']=$fields;transfer_assert(is_wp_error(netchat_transfer_decode(wp_json_encode($bad))),'malformed legacy fields returns validation error');}
+    foreach(array('enabled','question_steps','notices')as$key){$bad=$bundle;$bad['forms']['installed']['nc_primary_v1'][$key]=null;transfer_assert(is_wp_error(netchat_transfer_decode(wp_json_encode($bad))),'explicit null form property '.$key);}
+    foreach(array('condition','options','helper','placeholder')as$key){$bad=$bundle;$bad['forms']['installed']['nc_primary_v1']['fields'][0][$key]=null;transfer_assert(is_wp_error(netchat_transfer_decode(wp_json_encode($bad))),'explicit null field property '.$key);}
+    foreach(array('condition','any','before_contact','channel_link')as$key){$bad=$bundle;$bad['forms']['installed']['nc_primary_v1']['notices']=array(array('text'=>'Synthetic notice',$key=>null));transfer_assert(is_wp_error(netchat_transfer_decode(wp_json_encode($bad))),'explicit null notice property '.$key);}
+    $chain=$bundle;$source=$bundle['forms']['installed']['nc_primary_v1'];$source['id']='synthetic_new';$source['service_code']='SYNTHETIC_NEW';$chain['forms']['installed']['synthetic_new']=$source;$chained=$single;$chained['selected']=array('synthetic_new','nc_primary_v1');$chained['replace']=array('nc_primary_v1'=>'synthetic_new');transfer_assert(is_wp_error(netchat_transfer_preview(wp_json_encode($chain),$chained)),'replace cannot target an added form');
+    transfer_assert(is_wp_error(netchat_transfer_decode(str_repeat('x',1048577))),'oversize');transfer_assert(is_wp_error(netchat_transfer_decode('{broken')),'malformed');
+    $duplicate=preg_replace('/"product":"netchat"/','"product":"netchat","product":"netchat"',wp_json_encode($bundle),1);$duplicate_result=netchat_transfer_decode($duplicate);transfer_assert(is_wp_error($duplicate_result)&&$duplicate_result->get_error_message()==='Повтор ключа в JSON.','duplicate key in otherwise valid envelope');
+    $duplicate=$bundle;$duplicate['forms']['installed']['nc_example_v1']['service_code']='PRIMARY';transfer_assert(is_wp_error(netchat_transfer_decode(wp_json_encode($duplicate))),'duplicate service identity');
+    $large=netchat_service_forms_config();$retained=$large;$large['installed']=array();$large['primary_form']='';
+    for($n=0;$n<100;$n++){$form=$bundle['forms']['installed']['nc_primary_v1'];$form['id']='large_'.$n;$form['service_code']='LARGE_'.$n;$form['fields']=array();for($f=0;$f<20;$f++)$form['fields'][]=array('key'=>'field_'.$f,'label'=>str_repeat('L',240),'type'=>'text','required'=>false,'step'=>1,'placeholder'=>str_repeat('P',500),'helper'=>str_repeat('H',1000));$large['installed'][$form['id']]=$form;}
+    update_option('netchat_service_forms',$large,false);try{$too_large=netchat_transfer_export('forms');transfer_assert(is_wp_error($too_large)&&strpos($too_large->get_error_message(),'1 МиБ')!==false,'export refuses an unimportable oversized bundle');}finally{update_option('netchat_service_forms',$retained,false);}
+    $changed=$bundle;$changed['settings']['size']=60;$json=wp_json_encode($changed);$p=netchat_transfer_preview($json,$choices);$proof=array_intersect_key($p,array_flip(array('digest','ticket','settings_revision','forms_revision')));
+    $settings_before=netchat_storage_read();$forms_before=get_option('netchat_service_forms');
+    $fault=function($sql)use($table){return strpos($sql,"UPDATE $table SET option_value=")===0&&strpos($sql,"'netchat_service_forms'")!==false?'INVALID TRANSFER FIXTURE SQL':$sql;};$silence=$wpdb->suppress_errors(true);add_filter('query',$fault);
+    try{$r=netchat_transfer_apply($json,$choices,$proof);}finally{remove_filter('query',$fault);$wpdb->suppress_errors($silence);}
+    transfer_assert(is_wp_error($r)&&netchat_storage_read()===$settings_before&&get_option('netchat_service_forms')===$forms_before,'second option failure rolls back both');
+    $wpdb->query("ALTER TABLE `$table` ENGINE=MyISAM");$p=netchat_transfer_preview($json,$choices);$r=netchat_transfer_apply($json,$choices,array_intersect_key($p,array_flip(array('digest','ticket','settings_revision','forms_revision'))));transfer_assert(is_wp_error($r)&&netchat_storage_read()===$settings_before,'unsupported engine no writes');
+    WP_CLI::success($GLOBALS['nc_transfer_checks'].' transfer assertions passed.');
+}finally{
+    if(strpos($table,'nc_transfer_')!==0)throw new RuntimeException('Unsafe cleanup');$wpdb->query("DROP TABLE IF EXISTS `$table`");if(file_exists($json_fixture))unlink($json_fixture);$wpdb->options=$original;wp_cache_flush();netchat_storage_invalidate();
+}

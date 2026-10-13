@@ -1,0 +1,71 @@
+{
+  "nc_primary_v1": {
+    "schema_version": 1,
+    "enabled": 1,
+    "service_label": "Основная форма",
+    "title": "Связаться с нами",
+    "intro": "Оставьте вопрос и удобный способ связи.",
+    "submit_text": "Отправить обращение",
+    "success_text": "Спасибо! Обращение принято.",
+    "notices": [],
+    "id": "nc_primary_v1",
+    "service_code": "PRIMARY",
+    "question_steps": 1,
+    "fields": [
+      {
+        "key": "question",
+        "label": "Ваш вопрос",
+        "type": "text",
+        "required": true,
+        "step": 1,
+        "placeholder": "Что вы хотите обсудить?"
+      }
+    ]
+  },
+  "nc_example_v1": {
+    "schema_version": 1,
+    "enabled": 1,
+    "service_label": "Пример формы",
+    "title": "Пример обращения",
+    "intro": "Пример с вариантами ответа и дополнительным вопросом.",
+    "submit_text": "Отправить обращение",
+    "success_text": "Спасибо! Обращение принято.",
+    "notices": [],
+    "id": "nc_example_v1",
+    "service_code": "EXAMPLE",
+    "question_steps": 2,
+    "fields": [
+      {
+        "key": "topic",
+        "label": "Тема обращения",
+        "type": "radio",
+        "required": true,
+        "step": 1,
+        "options": {
+          "general": "Общий вопрос",
+          "details": "Нужны подробности"
+        }
+      },
+      {
+        "key": "description",
+        "label": "Краткое описание",
+        "type": "text",
+        "required": true,
+        "step": 1
+      },
+      {
+        "key": "extra",
+        "label": "Дополнительные сведения",
+        "type": "short",
+        "required": false,
+        "step": 2,
+        "condition": {
+          "key": "topic",
+          "values": [
+            "details"
+          ]
+        }
+      }
+    ]
+  }
+}
