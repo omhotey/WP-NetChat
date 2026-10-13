@@ -654,3 +654,16 @@ input[type="number"] {
 }
 
 .nc-scroll-setting{display:grid;gap:8px;min-width:0;margin:16px 0}.nc-scroll-setting label{font-weight:600}.nc-scroll-setting input{width:96px;max-width:100%}.nc-scroll-setting small{color:#475569;line-height:1.5;overflow-wrap:anywhere}.nc-scroll-setting input[aria-invalid=true]{border-color:#b32d2e}
+
+/* Keep intrinsic grid/button sizes within the plugin's mobile content area. */
+@media (max-width:900px) {
+    .netchat-standalone-page .netchat-layout { grid-template-columns:minmax(0,1fr); }
+    .netchat-standalone-page .nc-col-left,
+    .netchat-standalone-page .nc-col-right { min-width:0; }
+    .netchat-standalone-page .nc-btn-group { min-width:0;flex-wrap:wrap; }
+}
+@media (max-width:480px) {
+    .netchat-standalone-page .nc-btn-group { flex-direction:column; }
+    .netchat-standalone-page .nc-save-btn,
+    .netchat-standalone-page .nc-reset-btn { width:100%;box-sizing:border-box;white-space:normal; }
+}
