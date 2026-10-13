@@ -1,32 +1,39 @@
-# Release 1.2.0 candidate checklist
+# Проверки релиза 1.2.0
 
-Scroll addition acceptance remains open until the frozen source/packages pass real SQL and both hosted browser matrices. Check initial server hiding/tab order, below/at/above 25/50/100%, independent sticky thresholds, greeting delay at joint eligibility, dismissal/open-menu/form suppression, reload/history restoration, no-scroll page, dynamic height/resize, MutationObserver fallback without ResizeObserver, desktop/mobile rules, reduced motion/speed0 and explicit CTA/API before thresholds. Preserve pending success/error/20-second timeout scenarios. Verify admin save/reload/invalid feedback at 320/390/1440, authenticated older REST request, normalized export/legacy import, raw legacy read/CAS, stale proofs and atomic rollback. Source lint or prepared tests alone do not close this checklist.
+[Стабильный релиз 1.2.0](https://github.com/omhotey/WP-NetChat/releases/tag/v1.2.0) опубликован. Основание проверки кода: успешный [GitHub Actions 38446870987](https://github.com/omhotey/WP-NetChat/actions/runs/38446870987) на [ревизии 521678f138a33ebd057c764d298ec63fdd117104](https://github.com/omhotey/WP-NetChat/commit/521678f138a33ebd057c764d298ec63fdd117104). Тег и принятие после merge относятся к исходному дереву релиза; последующие правки документации не являются новым испытанием runtime.
 
-Distribution/transfer revision: public defaults are exactly two neutral forms. Private owner schemas and export files stay outside public source, hosted data and release assets. JSON transfer supports selected forms, settings and atomic bundle with preview, add/copy by default and explicit replacement. Current SQL/security/rollback and browser-transfer tests are prepared; NOT_RUN until observed execution. Earlier local results below apply to the earlier candidate and do not accept this new runtime revision.
+## Подтверждённые проверки
 
-Publication is pending a separate owner decision. Local checks ran on 2026-10-13 against WordPress 7.1.3 / PHP 8.3.33: JS32, WordPress104, lead/mail/privacy63, service247 (including full-answer email), editor130 and lifecycle33 assertions passed. PHP lint passed. Isolated ZIP smoke passed clean install, reinstall, reactivation, default uninstall retention, opt-in purge and the actual historical v1.0.0 archive upgrade preserving WP-NetChat-main basename and legacy JSON/contact settings. The final browser suite passed seven synthetic service paths and pending A→close→B success, error and real 20-second timeout. Restored configuration matched its original SHA256, the temporary session was revoked and synthetic requests were removed. These results do not establish minimum-version compatibility or production acceptance.
-
-| Check | Scope/status |
+| Область | Фактический результат для каждой пары |
 |---|---|
-| PHP 7.2 / WordPress 5.0 minimum pair | NOT_RUN locally; runtime unavailable, no images/dependencies downloaded |
-| Existing lab WordPress 7.1.3 / PHP 8.3.33 | Observed live; local checks passed |
-| `Tested up to: 7.1` | Declared major/minor ceiling; not an acceptance of every environment |
-| JS normalization, PHP lint, storage/permissions/validation/replay/full service mail | PASS on the observed local runtime |
-| Pending A→close→B success/error/20-second timeout | PASS in headless Edge with synthetic data |
-| ZIP clean install, reinstall, deactivate/uninstall retention | PASS in isolated smoke |
-| Actual public `WP-NetChat-main/` v1.0.0 → matching candidate | PASS: basename/JSON/contact/request retention |
-| Real phones, screen reader, production theme/cache/SMTP | NOT_RUN; separate product acceptance |
-| Hosted WordPress 5.0 / PHP 7.2 and WordPress 7.1.3 / PHP 8.3 | Runtime workflow prepared; NOT_RUN until actual Actions execution |
-| GitHub CI | Prepared; status must reference the actual run/commit before publication |
+| WordPress 5.0 / PHP 7.2 и WordPress 7.1.3 / PHP 8.3 | Обе матрицы прошли в указанном запуске |
+| Ядро и поставка | Точная версия, официальные checksum, SHA256 ZIP, каждый файл манифеста и совпадение с исходниками |
+| PHP/JS | Проверка синтаксиса; 32 общих примера нормализации |
+| WordPress settings / заявки / сервисные формы / редактор / жизненный цикл / перенос | 147 / 63 / 249 / 130 / 33 / 88 проверок на настоящем WordPress и SQL |
+| ZIP | Новая установка, повторная установка и активация, обновление реального 1.0.0 с сохранением папки и JSON, обычное удаление и явная очистка |
+| Сервисные формы в браузере | Семь синтетических схем, контактный шаг, сохранение и снимки, закрытие черновика, условные ошибки, шесть ширин |
+| Ожидающая отправка A → закрытие → B | Успех, ошибка 503 и настоящий 20-секундный тайм-аут; B восстанавливается после завершения запроса A |
+| Перенос в браузере | Реальные вход/права/nonce, скачивание и загрузка JSON, предварительный просмотр без записи, копирование/замена, конфликт ревизии и хеша |
+| Прокрутка и настройки | 52 проверки: пороги 25/50/100%, независимость и задержка, скрытие до порога, фокус, возврат назад, перезагрузка/история, короткая страница, высота/resize, fallback, API/CTA, мобильные настройки |
+| Публичный состав | Две нейтральные встроенные формы, семь синтетических тестовых схем; без частных определений в публичной поставке |
 
-## Package and public Git
+Мобильная админка проверена на 320/390/1440 px. На 320 px измеренное переполнение исходной компоновки было устранено: ширина документа 344 → 320, выступающие контролы 5 → 0. Проверка не использует скрытие overflow; сохраняются замеры и снимки до/после scoped CSS.
 
-- Validate fresh-install and matching upgrade ZIP roots, version/header/stable tag, archive SHA256 and every manifest entry hash.
-- Include runtime files only: entry point/uninstall/readme/LICENSE, PHP modules/preset JSON, approved assets/languages. Exclude governance, secrets, editor workspace files, lab, tests/results and development scripts from ZIP.
-- Public repository may include source, public docs, tests and CI. Use an explicit reviewed file list for staging; never `git add .`. Ignore rules do not remove previously tracked secrets.
-- Do not commit `AGENTS.md`, `contur-admin/`, credentials, private session output, workspace files or release test results.
-- Preserve existing uncommitted changes and old dist ZIPs; review candidate independently. No push, tag, release or production installation is part of this checklist's execution.
+## Границы проверки
 
-Commands: `pwsh -File tests/run.ps1` (server/package only); `node tests/service-forms-e2e.mjs` with bundled Playwright and outputs under `dist/release-1.2.0/browser`. The general `-Browser` runner is intentionally blocked because other suites still write historical result paths.
+Автоматический HTTP-запуск WP-Cron в однопроцессном браузерном стенде изолирован через `DISABLE_WP_CRON` только во временном CI-ядре и только после обычных SQL/ZIP-проверок. Расписание обработчиков проверено, уведомления и очистка явно запускались настоящим WP-CLI, после выполнения расписание проверялось снова. Это не доказывает автоматический cron на сайте или доставку письма. Реальные устройства, экранный диктор, тема, кеш/CDN, SMTP и документы конкретного сайта проверяются после установки.
 
-Hosted workflow `Release compatibility` builds both packages on Windows and passes those exact artifacts to each runtime pair. `tests/compatibility-ci.sh` verifies archive/per-entry/source hashes, exact core/PHP versions and WordPress checksums; runs the five existing integration suites and isolated ZIP smoke with the hash-verified public v1.0.0 asset. No hosted runtime PASS is claimed before the real run. Existing local results remain distinct from hosted results and production acceptance.
+Новые проверки PR с правками только документации относятся к новой ревизии. Они не заменяют и не расширяют результат runtime запуска 38446870987. Опубликованные ZIP и тег 1.2.0 не меняются.
+
+## Для следующего изменения кода
+
+- Проверить оба корня ZIP, версию/stable tag, архивный SHA256 и каждый файл манифеста.
+- Включать в ZIP только исполняемые файлы: основной файл, uninstall, readme, LICENSE, PHP-модули и preset JSON, разрешённые assets/languages. Исключить тесты, стенды, governance, секреты и результаты.
+- В публичном репозитории сохранить исходники, документацию, тесты и CI. Использовать просмотренный список файлов для staging; не добавлять автоматически весь рабочий каталог.
+- Не публиковать `AGENTS.md`, `contur-admin/`, credentials, сессии, приватные формы/JSON, workspace-файлы или результаты локальной работы.
+- Подтвердить каталог, документы, основной ID и неизменяемые снимки заявок; проверить устаревший JSON, строки процентов, ошибки/null, пределы 1 МиБ и повторные ключи.
+- Сохранить реальные проверки CAS, конфликтов обеих ревизий, InnoDB и отката второй записи.
+- Повторить браузерные пути, видимость и доступность контролов, открытие CTA/API до порога, pending success/error/timeout и скрытие приветствия после открытия формы.
+- Сохранить старые артефакты и пользовательские изменения; фиксировать фактический run/commit перед публикацией. Установка на рабочий сайт — отдельное действие.
+
+Команды и ограничения запуска приведены в [tests/README.md](../tests/README.md). `pwsh -File tests/run.ps1` запускает локальные серверные/пакетные проверки; общий `-Browser` блокируется из-за исторических путей результатов. `bash tests/compatibility-ci.sh` предназначен только для временного GitHub Actions worker. Workflow `Release compatibility` собирает два ZIP на Windows и передаёт именно эти артефакты обеим runtime-матрицам.
