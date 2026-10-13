@@ -1,0 +1,12 @@
+.nc-contact-alternatives{margin:0 0 22px;padding:0;border:0;font-family:inherit;font-size:13px;color:#526175}
+.nc-contact-alternatives summary{cursor:pointer;line-height:1.5;padding:10px 0;color:#526175;font-size:13px;font-weight:400}
+.nc-contact-alternatives nav{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;padding-bottom:8px}
+.nc-contact-alternatives a{display:inline-flex!important;align-items:center;gap:8px;min-height:40px;max-width:100%;padding:7px 11px;border:1px solid #dde3eb;border-radius:7px;background:#fff;color:#334155!important;text-decoration:none!important;font-size:13px;line-height:1.5;box-sizing:border-box}
+.nc-contact-alternatives a:hover{border-color:#93b4ff;background:#f5f8ff}
+.nc-contact-alternatives .nc-alternative-icon{display:flex;align-items:center;justify-content:center;width:24px;height:24px;flex-shrink:0;border-radius:6px;color:#fff}
+.nc-contact-alternatives svg{width:16px;height:16px;display:block;fill:currentColor}
+.nc-contact-alternatives :focus-visible{outline:3px solid #93b4ff;outline-offset:3px}
+.nc-editor-preview .nc-contact-alternatives{margin-top:8px}
+#nc-leads-modal .nc-leads-closebar{position:sticky;top:-24px;z-index:10;display:flex;justify-content:flex-end;padding:8px 0;background:#fff;margin:-16px -8px 8px 0}
+#nc-leads-modal .nc-leads-dialog .nc-leads-closebar .nc-leads-close{position:static;float:none;top:auto;right:auto;margin:0}
+@media(max-width:767px){#nc-leads-modal .nc-leads-closebar{top:-20px}}

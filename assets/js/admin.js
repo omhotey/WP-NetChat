@@ -6,63 +6,6 @@
     'use strict';
 
     /* ------------------------------------------------------------------
-       Validation helpers
-       ------------------------------------------------------------------ */
-    function validateInput(key, raw) {
-        var v = raw.trim();
-        if (!v) return { ok: true, url: '', msg: '' };
-
-        switch (key) {
-            case 'telegram': {
-                var u = v.replace(/^@/, '');
-                return /^[\w]{3,32}$/.test(u)
-                    ? { ok: true, url: 'https://t.me/' + u, msg: '' }
-                    : { ok: false, url: '', msg: '\u26A0\uFE0F 3\u201332' };
-            }
-            case 'whatsapp': {
-                var d = v.replace(/[^\d]/g, '');
-                return /^\d{10,15}$/.test(d)
-                    ? { ok: true, url: 'https://wa.me/' + d, msg: '' }
-                    : { ok: false, url: '', msg: '\u26A0\uFE0F 10\u201315' };
-            }
-            case 'vk': {
-                var u2 = v.replace(/^(https?:\/\/)?(vk\.com\/|vk\.me\/)/, '');
-                return /^[\w]{1,30}$/.test(u2)
-                    ? { ok: true, url: 'https://vk.me/' + u2, msg: '' }
-                    : { ok: false, url: '', msg: '\u26A0\uFE0F VK' };
-            }
-            case 'max': {
-                if (/^https?:\/\/max\.ru\//i.test(v)) return { ok: true, url: v, msg: '' };
-                if (/^[\w\/\-\.\?\=\#\&\+\~]+$/.test(v)) return { ok: true, url: 'https://max.ru/' + v, msg: '' };
-                return { ok: true, url: v, msg: '' };
-            }
-            case 'viber': {
-                var d2 = v.replace(/[^\d+]/g, '');
-                return /^\+?\d{10,15}$/.test(d2)
-                    ? { ok: true, url: 'viber://chat?number=%2B' + d2.replace(/^\+/, ''), msg: '' }
-                    : { ok: false, url: '', msg: '\u26A0\uFE0F +\u043D\u043E\u043C\u0435\u0440' };
-            }
-            case 'messenger': {
-                var u3 = v.replace(/^(https?:\/\/)?(m\.me\/|fb\.me\/)/, '');
-                return /^[\w.]{1,50}$/.test(u3)
-                    ? { ok: true, url: 'https://m.me/' + u3, msg: '' }
-                    : { ok: false, url: '', msg: '\u26A0\uFE0F FB' };
-            }
-            case 'email':
-                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
-                    ? { ok: true, url: 'mailto:' + v, msg: '' }
-                    : { ok: false, url: '', msg: '\u26A0\uFE0F Email' };
-            case 'phone': {
-                var d3 = v.replace(/[^\d+]/g, '');
-                return /^\+?\d[\d\-]{6,14}$/.test(v)
-                    ? { ok: true, url: 'tel:' + d3, msg: '' }
-                    : { ok: false, url: '', msg: '\u26A0\uFE0F \u0422\u0435\u043B' };
-            }
-        }
-        return { ok: true, url: v, msg: '' };
-    }
-
-    /* ------------------------------------------------------------------
        Collect all form state
        ------------------------------------------------------------------ */
     function collectState() {
@@ -100,15 +43,19 @@
 
         return {
             channels:   channels,
-            pos_right:  posRightEl ? posRightEl.value : '',
+            leads:      collectLeads(),
+            launcher_mode: document.querySelector('[name="nc-launcher-mode"]:checked')?.value || netchatAdmin.config.launcher_mode || 'form',
+            pos_right:  !isLeft && posRightEl ? posRightEl.value : '',
             pos_bottom: posBottomEl ? posBottomEl.value : '30',
             pos_left:   isLeft ? (posRightEl ? posRightEl.value : '') : '',
-            sz:         szEl ? parseInt(szEl.value, 10) || 56 : 56,
-            sp:         spEl ? parseInt(spEl.value, 10) || 300 : 300,
+            sz:         szEl ? Number(szEl.value) : 56,
+            sp:         spEl ? Number(spEl.value) : 300,
             cl:         clEl ? clEl.value : '#2563eb',
             h:          hEl ? hEl.checked : false,
             ht:         htEl ? htEl.value : '',
-            hd:         hdEl ? parseInt(hdEl.value, 10) || 2 : 2,
+            hd:         hdEl ? Number(hdEl.value) : 2,
+            button_scroll_percent: document.getElementById('nc-opt-bscroll')?.value ?? netchatAdmin.config.button_scroll_percent,
+            hint_scroll_percent: document.getElementById('nc-opt-hscroll')?.value ?? netchatAdmin.config.hint_scroll_percent,
             d:          dEl ? dEl.checked : false,
             m:          mEl ? mEl.checked : false,
             lang:       activeLangBtn ? activeLangBtn.getAttribute('data-lang') : 'ru'
@@ -119,14 +66,27 @@
        Build REST payload
        ------------------------------------------------------------------ */
     function buildPayload(s) {
+        if (document.querySelector('[data-nc-leads-only]')) {
+            var settings = JSON.parse(JSON.stringify(netchatAdmin.config));
+            settings.leads = s.leads;
+            return settings;
+        }
+        ['nc-opt-bscroll','nc-opt-hscroll'].forEach(function(id){
+            var input=document.getElementById(id);
+            if(input&&!input.checkValidity()){input.setAttribute('aria-invalid','true');input.reportValidity();input.focus();throw new Error('Введите целое число от 0 до 100: '+document.querySelector('label[for="'+id+'"]').textContent);}
+            if(input)input.removeAttribute('aria-invalid');
+        });
         var data = {
+            revision: netchatAdmin.revision,
+            leads: s.leads,
+            launcher_mode: s.launcher_mode,
             enabled: {},
             links: {},
             position: {
                 top:    '',
-                right:  s.pos_right !== ''  ? parseInt(s.pos_right, 10)  : '',
-                bottom: s.pos_bottom !== '' ? parseInt(s.pos_bottom, 10) : '30',
-                left:   s.pos_left !== ''   ? parseInt(s.pos_left, 10)   : ''
+                right:  s.pos_right !== ''  ? Number(s.pos_right)  : '',
+                bottom: s.pos_bottom !== '' ? Number(s.pos_bottom) : 30,
+                left:   s.pos_left !== ''   ? Number(s.pos_left)   : ''
             },
             size:       s.sz,
             animation:  s.sp,
@@ -134,6 +94,8 @@
             hint:       s.h ? 1 : 0,
             hint_text:  s.ht,
             hint_delay: s.hd,
+            button_scroll_percent: Number(s.button_scroll_percent),
+            hint_scroll_percent: Number(s.hint_scroll_percent),
             desktop:    s.d ? 1 : 0,
             mobile:     s.m ? 1 : 0,
             lang:       s.lang,
@@ -143,58 +105,70 @@
         for (var i = 0; i < s.channels.length; i++) {
             var ch = s.channels[i];
             data.enabled[ch.key] = ch.enabled ? 1 : 0;
-            var v = validateInput(ch.key, ch.value);
-            data.links[ch.key] = v.ok ? v.url : '';
+            var checked = NetChatValidation.normalize(ch.key, ch.value);
+            if (!checked.ok) throw new Error(netchatAdmin.i18n_invalid + ' (' + ch.name + ')');
+            data.links[ch.key] = checked.url;
         }
 
         return data;
     }
 
+    function collectLeads() {
+        var config = JSON.parse(JSON.stringify(netchatAdmin.config.leads));
+        document.querySelectorAll('[data-nc-lead-setting]').forEach(function (input) {
+            var keys = input.getAttribute('data-nc-lead-setting').split('.');
+            var target = config;
+            for (var i = 0; i < keys.length - 1; i++) target = target[keys[i]];
+            var value = input.type === 'checkbox' ? (input.checked ? 1 : 0) : input.value;
+            if (input.getAttribute('data-nc-lead-type') === 'recipients') value = value.split(/[,;\n]+/).map(function(s){return s.trim();}).filter(Boolean);
+            else if (input.type === 'number') value = Number(value);
+            target[keys[keys.length - 1]] = value;
+        });
+        return config;
+    }
+
     /* ------------------------------------------------------------------
        REST API save
        ------------------------------------------------------------------ */
-    function saveSettings() {
+    function saveSettings(payload, reloadAfterSave) {
         var saveBtn = document.getElementById('nc-save-btn');
-        if (!saveBtn) return;
-
-        saveBtn.disabled = true;
-        saveBtn.textContent = '\u23F3 Saving...';
-
+        var resetBtn = document.getElementById('nc-reset-btn');
+        if (!saveBtn || saveBtn.disabled) return;
         var s = collectState();
-
-        var payload = buildPayload(s);
-
+        try { payload = payload || buildPayload(s); }
+        catch (error) { showNotice(error.message, 'error'); return; }
+        payload.revision = netchatAdmin.revision;
+        saveBtn.disabled = true;
+        if (resetBtn) resetBtn.disabled = true;
+        saveBtn.textContent = netchatAdmin.i18n_saving || 'Saving...';
         fetch(netchatAdmin.restUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-WP-Nonce': netchatAdmin.restNonce
-            },
+            method: 'POST', credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': netchatAdmin.restNonce },
             body: JSON.stringify(payload)
-        })
-        .then(function (res) { return res.json(); })
-        .then(function (res) {
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = '\uD83D\uDCBE ' + (netchatAdmin.i18n_save_ok || 'Settings saved!');
-
-            if (res.success) {
-                showNotice('\u2705 ' + (res.message || netchatAdmin.i18n_save_ok), 'success');
-                if (res.lang_changed) {
-                    setTimeout(function () { location.reload(); }, 1200);
-                } else {
-                    setTimeout(function () {
-                        saveBtn.innerHTML = '\uD83D\uDCBE ' + (netchatAdmin.i18n_save_ok || 'Save Settings');
-                    }, 2000);
+        }).then(function (response) {
+            return response.json().then(function (body) {
+                if (!response.ok || !body.success) {
+                    var error = new Error(body.message || netchatAdmin.i18n_save_err);
+                    error.conflict = response.status === 409;
+                    throw error;
                 }
-            } else {
-                showNotice('\u274C ' + (res.message || netchatAdmin.i18n_save_err), 'error');
-                saveBtn.innerHTML = '\uD83D\uDCBE Save Settings';
+                return body;
+            });
+        }).then(function (response) {
+            netchatAdmin.revision = response.revision;
+            netchatAdmin.config = response.config;
+            var willReload = (reloadAfterSave || response.lang_changed) && JSON.stringify(s) === JSON.stringify(collectState());
+            window.dispatchEvent(new CustomEvent('netchat-settings-saved', {detail: {reload: !!willReload}}));
+            showNotice(response.message || netchatAdmin.i18n_save_ok, 'success');
+            if (willReload) {
+                location.reload();
             }
-        })
-        .catch(function () {
+        }).catch(function (error) {
+            showNotice(error.conflict ? netchatAdmin.i18n_conflict : (error.message || netchatAdmin.i18n_save_err), 'error');
+        }).then(function () {
             saveBtn.disabled = false;
-            saveBtn.innerHTML = '\uD83D\uDCBE Save Settings';
-            showNotice('\u274C ' + (netchatAdmin.i18n_save_err || 'Error saving'), 'error');
+            if (resetBtn) resetBtn.disabled = false;
+            saveBtn.textContent = netchatAdmin.i18n_save || 'Save settings';
         });
     }
 
@@ -214,6 +188,7 @@
         div.textContent = msg;
         container.appendChild(div);
 
+        if (type === 'error') return;
         setTimeout(function () {
             div.style.opacity = '0';
             div.style.transition = 'opacity 0.4s';
@@ -266,18 +241,8 @@
     function toggleMessengerInput(card) {
         var cb = card.querySelector('input[type="checkbox"]');
         var inputWrap = card.querySelector('.nc-messenger-input');
-        var input = inputWrap ? inputWrap.querySelector('.nc-input') : null;
-        if (!cb || !inputWrap || !input) return;
-
-        if (cb.checked) {
-            inputWrap.classList.add('visible');
-            // Restore saved value from data-real-value
-            var savedVal = input.getAttribute('data-real-value');
-            if (savedVal) input.value = savedVal;
-        } else {
-            inputWrap.classList.remove('visible');
-            input.value = '';
-        }
+        if (!cb || !inputWrap) return;
+        inputWrap.classList.toggle('visible', cb.checked);
     }
 
     /* ------------------------------------------------------------------
@@ -291,14 +256,9 @@
         var status = card.querySelector('.nc-input-status');
         if (!status) return;
 
-        var v = validateInput(key, input.value);
-        if (input.value && v.ok) {
-            status.textContent = '\u2705';
-        } else if (input.value && !v.ok) {
-            status.textContent = '\u26A0\uFE0F';
-        } else {
-            status.textContent = '';
-        }
+        var result = NetChatValidation.normalize(key, input.value);
+        status.textContent = result.ok ? '' : '\u26A0';
+        input.setAttribute('aria-invalid', result.ok ? 'false' : 'true');
     }
 
     /* ------------------------------------------------------------------
@@ -313,6 +273,8 @@
                 var btns = document.querySelectorAll('.nc-pos-btn');
                 for (var i = 0; i < btns.length; i++) btns[i].classList.remove('nc-pos-active');
                 posBtn.classList.add('nc-pos-active');
+                var sideLabel = document.getElementById('nc-pos-side-label');
+                if (sideLabel) sideLabel.textContent = sideLabel.getAttribute('data-' + posBtn.getAttribute('data-value'));
                 return;
             }
 
@@ -389,32 +351,20 @@
         if (resetBtn) {
             resetBtn.addEventListener('click', function (e) {
                 e.preventDefault();
-                if (!confirm('Сбросить все настройки до умолчаний?')) return;
+                var leadsOnly = !!document.querySelector('[data-nc-leads-only]');
+                if (!confirm(leadsOnly ? 'Восстановить настройки формы обращений? Состояние приёма и настройки виджета сохранятся.' : 'Сбросить настройки виджета и каналов? Приём заявок будет выключен, настройки формы сохранятся.')) return;
+                if (leadsOnly) {
+                    var reset = JSON.parse(JSON.stringify(netchatAdmin.config));
+                    reset.leads = JSON.parse(JSON.stringify(netchatAdmin.defaults.leads));
+                    reset.leads.enabled = netchatAdmin.config.leads.enabled;
+                    saveSettings(reset, true);
+                    return;
+                }
 
-                // Send reset payload via REST API
-                var resetPayload = {
-                    enabled: { telegram:0,whatsapp:0,messenger:0,max:0,vk:0,viber:0,email:0,phone:0 },
-                    links: { telegram:'',whatsapp:'',messenger:'',max:'',vk:'',viber:'',email:'',phone:'' },
-                    position: { top:'',right:'',bottom:'30',left:'' },
-                    size: 56, animation: 300, color: '#2563eb',
-                    hint: 0, hint_text: '', hint_delay: 2,
-                    desktop: 1, mobile: 1, lang: 'ru',
-                    order: 'telegram,whatsapp,messenger,max,vk,viber,email,phone'
-                };
-
-                fetch(netchatAdmin.restUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-WP-Nonce': netchatAdmin.restNonce
-                    },
-                    body: JSON.stringify(resetPayload)
-                }).then(function(res) { return res.json(); })
-                .then(function(res) {
-                    if (res.success) {
-                        location.reload();
-                    }
-                });
+                var widgetReset = JSON.parse(JSON.stringify(netchatAdmin.defaults));
+                widgetReset.leads = JSON.parse(JSON.stringify(netchatAdmin.config.leads));
+                widgetReset.leads.enabled = netchatAdmin.defaults.leads.enabled;
+                saveSettings(widgetReset, true);
             });
         }
     }

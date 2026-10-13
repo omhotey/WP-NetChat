@@ -1,59 +1,13 @@
 <?php
 /**
- * NetChat — JSON file based settings storage
- * No WP options, no transients, no cache — just a JSON file.
+ * NetChat — defaults, contacts and icons
+ * WordPress options storage is loaded below.
  * Author: omhotey
  */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'NETCHAT_DATA', WP_CONTENT_DIR . '/netchat-data.json' );
-
-/** Read config from JSON file */
-function netchat_get_config( $force_refresh = false ) {
-    static $cache = null;
-    if ( $force_refresh ) {
-        $cache = null;
-    }
-    if ( $cache !== null ) {
-        return $cache;
-    }
-    if ( ! file_exists( NETCHAT_DATA ) ) {
-        $cache = netchat_defaults();
-        return $cache;
-    }
-    $raw = @file_get_contents( NETCHAT_DATA );
-    if ( ! $raw ) {
-        $cache = netchat_defaults();
-        return $cache;
-    }
-    $data = json_decode( $raw, true );
-    if ( json_last_error() !== JSON_ERROR_NONE ) {
-        error_log( '[NetChat] JSON decode error: ' . json_last_error_msg() . ' in ' . NETCHAT_DATA );
-    }
-    $cache = is_array( $data ) ? array_merge( netchat_defaults(), $data ) : netchat_defaults();
-    return $cache;
-}
-
-/** Save config to JSON file */
-function netchat_save_config( $config ) {
-    // Clear static cache before saving
-    netchat_get_config( true );
-    $json = wp_json_encode( $config, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE );
-    if ( ! $json ) {
-        error_log( '[NetChat] json_encode failed' );
-        return false;
-    }
-    $result = @file_put_contents( NETCHAT_DATA, $json, LOCK_EX );
-    if ( $result === false ) {
-        error_log( '[NetChat] file_put_contents failed for ' . NETCHAT_DATA );
-    }
-    return $result !== false;
-}
-
-/** Delete config (full reset to defaults) */
-function netchat_delete_config() {
-    return file_exists( NETCHAT_DATA ) ? @unlink( NETCHAT_DATA ) : true;
-}
+require_once __DIR__ . '/storage.php';
+require_once __DIR__ . '/normalization.php';
 
 /** Default config — ALL OFF, ALL EMPTY */
 function netchat_defaults() {
@@ -63,8 +17,11 @@ function netchat_defaults() {
         'position'  => [ 'top'=>'','right'=>'','bottom'=>'30','left'=>'' ],
         'size'=>56, 'animation'=>300, 'desktop'=>1, 'mobile'=>1,
         'hint'=>0, 'hint_text'=>'', 'hint_delay'=>2,
+        'button_scroll_percent'=>0, 'hint_scroll_percent'=>0,
         'order'=>'telegram,whatsapp,messenger,max,vk,viber,email,phone',
         'color'=>'#2563eb', 'lang'=>'ru',
+        'launcher_mode'=>'form',
+        'leads'=>netchat_leads_defaults(),
     ];
 }
 
@@ -73,7 +30,7 @@ function netchat_is_active() {
     $c = netchat_get_config();
     foreach ( $c['enabled'] as $k => $v )
         if ( $v && ! empty( $c['links'][$k] ) ) return true;
-    return false;
+    return ! empty( $c['leads']['enabled'] );
 }
 
 /** Messenger list */
@@ -90,56 +47,9 @@ function netchat_messengers() {
     ];
 }
 
-function netchat_clear_cache() {
-    netchat_get_config( true );
-    return netchat_delete_config();
-}
-
 /** Translate */
 function nc_t( $en, $ru ) {
     return ( netchat_get_config()['lang'] ?? 'ru' ) === 'ru' ? $ru : $en;
-}
-
-/** Validate URL — per messenger rules */
-function netchat_validate_url( $url, $type ) {
-    $url = trim( $url );
-    if ( empty( $url ) ) return '';
-    switch ( $type ) {
-        case 'telegram':
-            // Accept both raw username and full URL
-            if ( preg_match('/^https?:\/\/t\.me\//i', $url) ) return $url;
-            $u = ltrim( $url, '@' );
-            return preg_match('/^[\w]{3,32}$/', $u) ? 'https://t.me/'.$u : '';
-        case 'whatsapp':
-            if ( preg_match('/^https?:\/\/wa\.me\//i', $url) ) return $url;
-            $d = preg_replace('/[^\d]/','',$url);
-            return preg_match('/^\d{10,15}$/',$d) ? 'https://wa.me/'.$d : '';
-        case 'vk':
-            if ( preg_match('/^https?:\/\/vk\.me\//i', $url) ) return $url;
-            $u = preg_replace('/^(https?:\/\/)?(vk\.com\/|vk\.me\/)/','',$url);
-            return preg_match('/^[\w]{1,30}$/',$u) ? 'https://vk.me/'.$u : '';
-        case 'max':
-            if ( preg_match('/^https?:\/\/max\.ru\//i',$url) ) return $url;
-            if ( preg_match('/^[\w\/\-\.\?\=\#\&\+\~]+$/',$url) ) return 'https://max.ru/'.$url;
-            return $url;
-        case 'viber':
-            if ( preg_match('/^viber:\/\//i', $url) ) return $url;
-            $d = preg_replace('/[^\d+]/','',$url);
-            return preg_match('/^\+?\d{10,15}$/',$d) ? 'viber://chat?number=%2B'.ltrim($d,'+') : '';
-        case 'messenger':
-            if ( preg_match('/^https?:\/\/m\.me\//i', $url) ) return $url;
-            $u = preg_replace('/^(https?:\/\/)?(m\.me\/|fb\.me\/)/','',$url);
-            return preg_match('/^[\w.]{1,50}$/',$u) ? 'https://m.me/'.$u : '';
-        case 'email':
-            // Strip mailto: prefix if present
-            $e = preg_replace('/^mailto:/i','',$url);
-            return filter_var($e,FILTER_VALIDATE_EMAIL) ? 'mailto:'.$e : '';
-        case 'phone':
-            // Strip tel: prefix if present
-            $p = preg_replace('/^tel:/i','',$url);
-            return preg_match('/^\+?\d[\d\-]{6,14}$/',$p) ? 'tel:'.preg_replace('/[^\d+]/','',$p) : '';
-    }
-    return filter_var($url,FILTER_VALIDATE_URL) ? esc_url_raw($url) : '';
 }
 
 /** SVG icons */

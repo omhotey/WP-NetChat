@@ -36,5 +36,17 @@ tests/results/
 *~
 
 # Project artifacts
+dist/
 Star.html
 Star_files/
+
+# Private local governance/editor/environment
+/AGENTS.md
+/contur-admin/
+/includes-workspace/
+*.code-workspace
+.env
+.env.*
+!.env.example
+*.pem
+*.key

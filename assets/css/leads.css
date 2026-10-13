@@ -1,0 +1,35 @@
+#nc-leads-modal[hidden]{display:none!important}
+#nc-leads-modal [hidden]{display:none!important}
+#netchat .nc-form{border:0;cursor:pointer}
+#nc-leads-modal,#nc-leads-modal *{box-sizing:border-box}
+#nc-leads-modal{position:fixed;inset:0;z-index:1000000;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(15,23,42,.58);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;line-height:1.5;color:#0f172a}
+#nc-leads-modal .nc-leads-dialog{position:relative;width:100%;max-width:520px;max-height:calc(100vh - 48px);max-height:calc(100dvh - 48px);overflow:auto;overscroll-behavior:contain;background:#fff;border-radius:18px;box-shadow:0 24px 80px rgba(0,0,0,.3);padding:28px;animation:ncLeadEnter .18s ease-out}
+#nc-leads-modal h2{margin:0 40px 20px 0;padding:0;font-size:24px;line-height:1.3;color:inherit}
+#nc-leads-modal .nc-leads-close{position:absolute;right:12px;top:12px;width:40px;height:40px;display:flex;justify-content:center;align-items:center;background:transparent;border:0;padding:0;color:#475569;border-radius:8px;font-size:30px;line-height:1;cursor:pointer}
+#nc-leads-modal .nc-leads-close:hover{background:#f1f5f9}
+#nc-leads-modal .nc-leads-field{margin:0 0 14px}
+#nc-leads-modal .nc-leads-field label{display:block;margin:0 0 5px;font-size:14px;font-weight:600}
+#nc-leads-modal .nc-leads-field input,#nc-leads-modal .nc-leads-field textarea{display:block;width:100%;min-height:44px;margin:0;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#0f172a;font-family:inherit;font-size:16px;line-height:1.4;box-shadow:none}
+#nc-leads-modal .nc-leads-field textarea{resize:vertical;min-height:110px}
+#nc-leads-modal .nc-leads-consent{display:flex;align-items:flex-start;gap:9px;margin:18px 0;font-size:13px}
+#nc-leads-modal .nc-leads-consent input{flex:0 0 auto;margin:3px 0 0;width:18px;height:18px}
+#nc-leads-modal .nc-leads-consent a{color:#1d4ed8;text-decoration:underline}
+#nc-leads-modal .nc-leads-submit{width:100%;min-height:44px;border:0;border-radius:9px;background:#2563eb;color:#fff;padding:11px 18px;font-family:inherit;font-size:16px;font-weight:600;line-height:1.4;cursor:pointer}
+#nc-leads-modal .nc-leads-submit:disabled{cursor:wait;opacity:.65}
+#nc-leads-modal .nc-leads-status{margin:12px 0 0;font-size:14px;overflow-wrap:anywhere;color:#166534}
+#nc-leads-modal .nc-leads-status:empty{display:none}
+#nc-leads-modal .nc-leads-status[data-error]{color:#b91c1c}
+#nc-leads-modal :focus-visible{outline:3px solid #2563eb;outline-offset:3px}
+#nc-leads-modal .nc-leads-trap{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}
+@keyframes ncLeadEnter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media(max-width:600px){#nc-leads-modal{align-items:flex-end;padding:0}#nc-leads-modal .nc-leads-dialog{max-width:none;max-height:calc(100vh - 20px);max-height:calc(100dvh - 20px);border-radius:18px 18px 0 0;padding:24px 20px;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}}
+@media(prefers-reduced-motion:reduce){#nc-leads-modal .nc-leads-dialog{animation:none}}
+@media print{#nc-leads-modal{display:none!important}}
+#nc-leads-modal .nc-leads-success { text-align:center;padding:28px 4px 4px; }
+#nc-leads-modal .nc-leads-success-icon { display:flex;align-items:center;justify-content:center;width:88px;height:88px;margin:0 auto 24px;border-radius:50%;background:#dcfce7;color:#15803d; }
+#nc-leads-modal .nc-leads-success-icon svg { width:48px;height:48px; }
+#nc-leads-modal .nc-leads-success h3 { margin:0 0 12px;font-size:26px;line-height:1.3; }
+#nc-leads-modal .nc-leads-success p { margin:0 0 28px;font-size:16px;line-height:1.6;color:#475569; }
+#nc-leads-modal .nc-leads-done { min-height:46px;width:100%;border:0;border-radius:10px;background:#2563eb;color:white;padding:12px 20px;font:inherit;font-weight:600;cursor:pointer; }
+#nc-leads-modal .nc-leads-close { position:sticky;top:0;float:right;z-index:2;margin:-12px -12px 4px 8px;background:#f1f5f9; }
+@media(max-width:600px){#nc-leads-modal .nc-leads-dialog{max-height:calc(100dvh - 32px);padding-top:20px}#nc-leads-modal .nc-leads-close{margin:-8px -4px 4px 8px}}

@@ -3,7 +3,7 @@
  * Plugin Name: NetChat
  * Plugin URI:  https://github.com/omhotey/WP-NetChat
  * Description: Плавающая кнопка связи с мессенджерами. Telegram, WhatsApp, VK, MAX, Viber, Messenger, Email, Телефон. Автор: omhotey.
- * Version:     1.0.0
+ * Version:     1.2.0
  * Author:      omhotey
  * Author URI:  https://github.com/omhotey
  * License:     GPLv2 or later
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 define( 'NETCHAT_FILE', __FILE__ );
 define( 'NETCHAT_DIR', plugin_dir_path( __FILE__ ) );
 define( 'NETCHAT_URL', plugin_dir_url( __FILE__ ) );
-define( 'NETCHAT_VER', '1.0.0' );
+define( 'NETCHAT_VER', '1.2.0' );
 
 // Load translations
 add_action( 'plugins_loaded', function() {
@@ -27,9 +27,20 @@ add_action( 'plugins_loaded', function() {
 } );
 
 // Load plugin files
+require_once NETCHAT_DIR . 'includes/leads-settings.php';
 require_once NETCHAT_DIR . 'includes/helpers.php';
 require_once NETCHAT_DIR . 'includes/admin.php';
 require_once NETCHAT_DIR . 'includes/frontend.php';
+foreach ( array('leads.php','service-forms.php','service-forms-validation.php','service-forms-admin.php','data-transfer.php','leads-admin.php','leads-notifications.php','leads-privacy.php','leads-frontend.php') as $netchat_module ) {
+    require_once NETCHAT_DIR . 'includes/' . $netchat_module;
+}
+
+add_action( 'plugins_loaded', 'netchat_upgrade_storage', 5 );
+function netchat_upgrade_storage() {
+    netchat_get_config( true );
+    if ( function_exists('netchat_leads_install') && ! netchat_get_migration_error() ) netchat_leads_install();
+    if (!netchat_get_migration_error()) netchat_service_initialize();
+}
 
 // Settings link on plugins page — direct to our standalone menu
 add_filter( 'plugin_action_links_' . plugin_basename( NETCHAT_FILE ), function( $links ) {
@@ -48,48 +59,19 @@ add_filter( 'plugin_row_meta', function( $links, $file ) {
  * Activation - create default options
  */
 register_activation_hook( NETCHAT_FILE, 'netchat_activate' );
-function netchat_activate() {
-    $defaults = array(
-        'enabled'   => array(
-            'telegram'=>0, 'whatsapp'=>0, 'messenger'=>0, 'max'=>0,
-            'vk'=>0, 'viber'=>0, 'email'=>0, 'phone'=>0
-        ),
-        'links'     => array(
-            'telegram'=>'', 'whatsapp'=>'', 'messenger'=>'', 'max'=>'',
-            'vk'=>'', 'viber'=> '', 'email'=>'', 'phone'=>''
-        ),
-        'position'  => array( 'top'=>'', 'right'=>'', 'bottom'=>'30', 'left'=>'' ),
-        'size'      => 56,
-        'animation' => 300,
-        'desktop'   => 1,
-        'mobile'    => 1,
-        'hint'      => 0,
-        'hint_text' => '',
-        'hint_delay'=> 2,
-        'order'     => 'telegram,whatsapp,messenger,max,vk,viber,email,phone',
-        'color'     => '#2563eb',
-        'lang'      => 'ru',
-    );
-
-    // Always overwrite with fresh defaults on activation — use JSON file storage
-    netchat_delete_config();
-    netchat_save_config( $defaults );
+function netchat_activate( $network_wide = false ) {
+    if ( $network_wide ) wp_die( 'NetChat supports single-site activation only.' );
+    netchat_get_config( true );
+    if ( function_exists('netchat_leads_install') && ! netchat_get_migration_error() ) netchat_leads_install();
+    if (!netchat_get_migration_error()) netchat_service_initialize();
 }
-
 /**
  * Deactivation - do nothing (preserve settings)
  */
 register_deactivation_hook( NETCHAT_FILE, 'netchat_deactivate' );
 function netchat_deactivate() {
+    wp_clear_scheduled_hook('netchat_leads_send_notifications');
+    wp_clear_scheduled_hook('netchat_leads_retention_cleanup');
     // Do not delete config on deactivation
     // Settings are preserved for re-activation
-}
-
-/**
- * Uninstall - remove all data
- */
-register_uninstall_hook( NETCHAT_FILE, 'netchat_uninstall' );
-function netchat_uninstall() {
-    delete_option( 'netchat_config' );
-    netchat_delete_config();
 }

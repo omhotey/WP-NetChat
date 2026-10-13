@@ -1,3 +1,5 @@
+.nc-form-settings-link{display:inline-block;margin-top:12px;color:#2563eb;text-decoration:none;line-height:1.5;padding:6px 0;min-height:32px}.nc-form-settings-link:hover{text-decoration:underline}.nc-form-channel .nc-toggle{flex-shrink:0}.nc-form-channel .nc-messenger-icon{color:#fff}
+.nc-launcher-options{display:grid;gap:10px}.nc-launcher-options label{display:flex;align-items:flex-start;gap:12px;padding:14px;border:1px solid #dde3eb;border-radius:8px;cursor:pointer}.nc-launcher-options label:has(input:checked){border-color:#93b4ff;background:#eff6ff}.nc-launcher-options input{margin-top:4px!important;flex-shrink:0}.nc-launcher-options strong{display:block;font-size:14px;font-weight:600}.nc-launcher-options small{display:block;color:#526175;font-size:12px;line-height:1.6;margin-top:4px}.nc-launcher-help{color:#526175;font-size:12px;line-height:1.6;margin-bottom:0}
 /**
  * NetChat Admin Styles - Material Design 3
  * Author: omhotey
@@ -649,4 +651,19 @@ input[type="number"] {
         flex-direction: column;
         gap: 12px;
     }
+}
+
+.nc-scroll-setting{display:grid;gap:8px;min-width:0;margin:16px 0}.nc-scroll-setting label{font-weight:600}.nc-scroll-setting input{width:96px;max-width:100%}.nc-scroll-setting small{color:#475569;line-height:1.5;overflow-wrap:anywhere}.nc-scroll-setting input[aria-invalid=true]{border-color:#b32d2e}
+
+/* Keep intrinsic grid/button sizes within the plugin's mobile content area. */
+@media (max-width:900px) {
+    .netchat-standalone-page .netchat-layout { grid-template-columns:minmax(0,1fr); }
+    .netchat-standalone-page .nc-col-left,
+    .netchat-standalone-page .nc-col-right { min-width:0; }
+    .netchat-standalone-page .nc-btn-group { min-width:0;flex-wrap:wrap; }
+}
+@media (max-width:480px) {
+    .netchat-standalone-page .nc-btn-group { flex-direction:column; }
+    .netchat-standalone-page .nc-save-btn,
+    .netchat-standalone-page .nc-reset-btn { width:100%;box-sizing:border-box;white-space:normal; }
 }
