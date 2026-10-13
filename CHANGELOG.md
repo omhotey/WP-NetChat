@@ -1,19 +1,21 @@
-# Changelog
+# История изменений
 
-## 1.2.0 — release candidate, 2026-10-13
+## 1.2.0 — опубликовано 13 октября 2026 года
 
-- Independent button and greeting scroll percentages (0–100); sticky appearance, greeting delay after joint eligibility, accessible initial hiding and no persistent scroll tracking. Legacy reads stay unchanged; older REST clients preserve current percentages and older imports default to zero.
+[Релиз и готовые архивы](https://github.com/omhotey/WP-NetChat/releases/tag/v1.2.0).
 
-- Exactly two neutral public defaults: primary and example; separate form catalog/editor; create, duplicate, enable, delete and immutable submission snapshots.
-- Private JSON export/import of settings, selected forms and complete bundles, with preview, default copies, explicit replacement, nonce/permissions and atomic revision checks. Existing site definitions survive upgrades.
-- One primary form, page bindings, two launcher modes and a single column of contact icons.
-- Persistent public request references and replay protection.
-- Fixed pending submission A → close → open B: the visible form recovers after success, error or timeout. Closing while sending explicitly says that the request continues.
-- Service email intentionally includes contacts, saved answers with snapshot labels, source and protected admin link even when contact-form `include_message` is off. Privacy guidance now describes this behavior.
-- Atomic ZIP construction, archive/per-file SHA256 manifests; separate fresh-install and existing `WP-NetChat-main` upgrade packages.
+- Независимые пороги прокрутки 0–100% для кнопки и приветствия. Кнопка остаётся доступной после достижения порога; задержка приветствия начинается после достижения обоих порогов. До появления кнопка скрыта и недоступна для фокуса. Постоянный трекинг прокрутки не добавлен.
+- Каталог форм и отдельный редактор: создание, копирование, включение, удаление, предпросмотр, настройка вопросов и условий. Публичная новая установка содержит основную нейтральную форму и пример; приём обращений изначально выключен.
+- Одна основная форма, привязки к страницам и два режима кнопки: сразу форма либо меню формы и каналов связи.
+- Перенос настроек и выбранных форм через JSON с предварительным просмотром, копированием по умолчанию, явной заменой, проверкой прав и атомарным сохранением. Существующие формы сохраняются при обновлении.
+- Сохранённые заявки содержат снимок формы и постоянный публичный номер. Повтор запроса не создаёт новую заявку; удаление или изменение формы не переписывает её прежние снимки.
+- Исправлено восстановление формы B после закрытия формы A во время отправки: успех, ошибка и тайм-аут не оставляют B заблокированной. Закрытие не отменяет уже начатый запрос.
+- Сервисные уведомления содержат контакты, полные сохранённые ответы, источник и защищённую ссылку на заявку независимо от настройки текста обычной контактной формы.
+- Настройки хранятся в WordPress Options API с проверкой ревизии; старый JSON переносится с сохранением источника. Старые настройки получают эффективные пороги 0 без перезаписи при чтении, старый REST-клиент сохраняет текущие пороги, а старый импорт получает 0.
+- Отдельные ZIP для папок `netchat/` и `WP-NetChat-main/`, пофайловые манифесты и SHA256. Исправлена мобильная компоновка настроек и кнопок сохранения.
 
-This is a local candidate, not a published release or production acceptance. See [validation checklist](docs/RELEASE_CHECKLIST.md) and [upgrade/rollback](docs/UPGRADE.md).
+Код релиза проверен на WordPress 5.0 / PHP 7.2 и WordPress 7.1.3 / PHP 8.3 в [запуске 38446870987](https://github.com/omhotey/WP-NetChat/actions/runs/38446870987), исходная ревизия [521678f](https://github.com/omhotey/WP-NetChat/commit/521678f138a33ebd057c764d298ec63fdd117104). Обновление этих документов в main не меняет код и архивы тега 1.2.0. Границы проверки описаны в [чек-листе](docs/RELEASE_CHECKLIST.md).
 
-## Earlier work
+## 1.0.0 — предыдущий публичный релиз
 
-1.0.0 is the historical public release. Options API/revision migration, contact intake, email/privacy and subsequent editor work are documented in the existing historical reports. Their old PASS results are not reasserted here.
+[Исторический релиз 1.0.0](https://github.com/omhotey/WP-NetChat/releases/tag/v1.0.0) сохранён. Его архив использует папку `WP-NetChat-main/`; переход на 1.2.0 проверен с соответствующим архивом обновления. Инструкции — в [руководстве по обновлению](docs/UPGRADE.md).

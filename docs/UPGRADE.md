@@ -1,32 +1,49 @@
-# Upgrade and rollback — 1.2.0 candidate
+# Установка, обновление и откат 1.2.0
 
-Scroll settings `button_scroll_percent` and `hint_scroll_percent` default to integer 0. Ordinary reads of older stored settings supply effective defaults without updating option bytes or revisions. Older REST clients omitting these keys keep the current values; an explicit save/import uses existing authentication and revision checks. Older portable JSON imports supply 0. Export includes both normalized values. A form-only import leaves settings intact. Public/private packages use the same runtime; no existing form/submission data is reset for this feature.
+Версия 1.2.0 [опубликована](https://github.com/omhotey/WP-NetChat/releases/tag/v1.2.0). Совместимость точных пар WordPress 5.0 / PHP 7.2 и WordPress 7.1.3 / PHP 8.3 подтверждена [запуском 38446870987](https://github.com/omhotey/WP-NetChat/actions/runs/38446870987) для [ревизии 521678f](https://github.com/omhotey/WP-NetChat/commit/521678f138a33ebd057c764d298ec63fdd117104). Проверка темы, кеша, документов согласия и почтового транспорта конкретного сайта выполняется при установке.
 
-Publication and installation on production need a separate owner decision. Review RELEASE_CHECKLIST.md first; PHP 7.2 / WordPress 5.0 remain declared minima but were not tested locally in this gate.
+## Выбор архива
 
-## Choose the matching package
+До загрузки проверьте имя папки установленного плагина. Исторический архив 1.0.0 имеет корень `WP-NetChat-main/`; имя ZIP само по себе не доказывает имя папки внутри.
 
-Inspect the actual installed plugin basename in WordPress before uploading. The historical public v1.0.0 asset has root `WP-NetChat-main/` (not `netchat/`). Never infer the root from the ZIP filename.
-
-| Installed basename | Candidate ZIP | Entry point |
+| Установленный плагин | Архив релиза | Входной файл |
 |---|---|---|
-| Fresh installation / `netchat/netchat.php` | `netchat-wp.zip` | `netchat/netchat.php` |
+| Новая установка или `netchat/netchat.php` | `netchat-wp.zip` | `netchat/netchat.php` |
 | `WP-NetChat-main/netchat.php` | `netchat-upgrade-WP-NetChat-main.zip` | `WP-NetChat-main/netchat.php` |
 
-Another basename requires a reviewed matching package; do not rename the folder automatically or activate two copies. Both packages contain identical runtime files with different root names. Verify archive SHA256 and every ZIP entry against the corresponding `.manifest.json`.
+Оба архива содержат одинаковый исполняемый код, отличаются корневой папкой. Для иной папки нужен совместимый архив: не переименовывайте её автоматически и не активируйте две копии. Сверьте SHA256 скачанного файла с `SHA256SUMS.txt`, а состав и хеш каждого файла — с соответствующим `*.manifest.json` на странице релиза.
 
-## Before and after upgrade
+Через WordPress: **Плагины → Добавить новый → Загрузить плагин**. Для новой установки можно использовать WP-CLI:
 
-Public packages contain exactly two neutral defaults (primary and example), created only when no saved form registry exists. Upgrades preserve the existing registry/settings/bindings and do not reinstall deleted forms. Transfer your own definitions privately using [JSON export/import](DATA_TRANSFER.md); never attach a private bundle to a public issue or release. A private package may contain the owner's existing definitions with identical common runtime; its first definition is selected primary only on fresh initialization if the public primary ID is absent. Existing primary selection survives upgrades.
+```sh
+wp plugin install /path/to/netchat-wp.zip --activate
+```
 
-1. The site owner makes their normal database/files backup, separately from this task. Retain the installed folder, database and `wp-content/netchat-data.json`; no automatic backup is created by the plugin.
-2. Record basename, current version, enabled contacts, form IDs/bindings/primary, sample existing request IDs and configured recipients/documents. Keep this inventory private.
-3. On a matching staging environment, replace the same plugin basename through WordPress; keep a single active copy. The legacy JSON importer reads `WP_CONTENT_DIR/netchat-data.json` independent of plugin folder name, preserves the source and migrates settings to Options API.
-4. Verify contacts, settings/revision, saved requests/snapshots, primary form, page bindings and one synthetic request/retry. Verify real consent documents, retention and recipients before enabling intake. New installations start with intake disabled.
-5. Check WP-Cron, outbound mail transport, error/retry states and privacy export/erase. `wp_mail=true` means handed to mail transport, not delivered. Service notifications include full saved answers regardless of the legacy contact-message switch; deletion does not recall email or hosting backups.
+Для обновления выберите архив с прежним именем папки и замените существующую установку средствами WordPress.
 
-## Rollback
+## Сохранность данных
 
-Deactivation and ordinary uninstall preserve data. Never set `NETCHAT_DELETE_DATA=true` during upgrade or rollback: it explicitly deletes plugin options, request tables and legacy JSON on uninstall.
+Новая публичная установка создаёт две нейтральные формы, только если сохранённого каталога ещё нет. Обновление сохраняет каталог, настройки, привязки и основную форму; удалённые формы не восстанавливаются автоматически. Собственные определения можно перенести через [приватный JSON](DATA_TRANSFER.md); не публикуйте его в issue или релизе.
 
-Stop intake before a rollback decision; restore only the reviewed plugin code into the same basename and preserve current data. Returning to 1.0.0 cannot read the newer SQL requests/forms and may expose stale JSON configuration; it is not a safe automatic rollback. Retain new records and coordinate a version-compatible recovery rather than replacing the database with an old snapshot. Stop on schema incompatibility. Runtime rollback and production recovery were not performed by this gate.
+В частной сборке определения могут отличаться, а общий исполняемый код остаётся тем же. При первоначальном создании каталога без публичного ID `nc_primary_v1` основной становится первая частная схема. Существующая основная форма при обновлении сохраняется.
+
+Поля `button_scroll_percent` и `hint_scroll_percent` по умолчанию равны 0. Чтение старых настроек не меняет байты options и ревизии. Старый REST-клиент, не передающий новые поля, сохраняет текущие значения. Старый JSON-импорт получает 0, экспорт включает нормализованные пороги, а импорт только форм не меняет настройки.
+
+## Проверка до и после обновления
+
+1. Подготовьте обычную резервную копию базы и файлов средствами владельца сайта. Сохраните текущую папку плагина и `wp-content/netchat-data.json`; плагин не создаёт автоматическую резервную копию.
+2. Зафиксируйте имя папки, версию, контакты, ID форм, привязки, основную форму, получателей, документы и несколько существующих заявок. Храните эти сведения приватно.
+3. На подходящем тестовом сайте обновите одну копию с прежним именем папки. Старый импорт читает `WP_CONTENT_DIR/netchat-data.json` независимо от имени папки, сохраняет источник и переносит настройки в Options API.
+4. Проверьте контакты, настройки и ревизию, старые заявки и их снимки, формы и привязки. Отправьте синтетическую заявку и проверьте повтор запроса. До включения приёма укажите реальные документы, срок хранения и получателей. В новой установке приём выключен.
+5. Проверьте автоматический WP-Cron, уведомления, ошибки и повтор отправки, экспорт и стирание WordPress. Успешный `wp_mail` означает передачу транспорту, а не доставку письма. Сервисное письмо включает полные сохранённые ответы независимо от переключателя текста обычной контактной формы.
+6. После смены настроек очистите кеш страниц/CDN и проверьте интерфейс на используемых устройствах.
+
+## Откат
+
+Деактивация и обычное удаление сохраняют данные. Не задавайте `NETCHAT_DELETE_DATA=true` при обновлении или откате: при удалении это явно очищает options, таблицы заявок, очереди обработчиков и старый JSON.
+
+Перед откатом остановите приём обращений. Возвращайте только совместимый код в ту же папку, сохраняя текущие данные. Версия 1.0.0 не читает новые SQL-заявки и формы и может использовать устаревший JSON; автоматический откат на неё небезопасен для сохранности новых записей. При несовместимой схеме остановитесь и подготовьте совместимое восстановление вместо замены актуальной базы старым снимком.
+
+Удаление данных плагина не отзывает отправленные письма и не удаляет резервные копии хостинга. Подробности обработки данных — в [руководстве по переносу](DATA_TRANSFER.md) и [README](../README.md).
+
+Эта редакция документации относится к main после релиза. Опубликованные архивы и тег 1.2.0 сохраняют ранее принятые байты и не пересобираются из-за изменения текста.
