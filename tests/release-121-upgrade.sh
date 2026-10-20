@@ -68,5 +68,9 @@ for root in netchat WP-NetChat-main; do
  echo "PASS active 1.2.0 -> 1.2.1 $root: raw settings, forms, requests, keys, limits, users and active basename unchanged; new settings persist."
  wp --path="$fixture" plugin deactivate "$root" >/dev/null
  wp --path="$fixture" plugin uninstall "$root" >/dev/null
+ # Each root starts from old-version settings, never a downgrade of 1.2.1 fields.
+ # Only the exact synthetic fixture core/prefix allocated above is affected.
+ wp --path="$fixture" --skip-plugins option delete netchat_settings >/dev/null
+ wp --path="$fixture" --skip-plugins option delete netchat_service_forms >/dev/null
  rm "$fixture/retained-state.json"
 done
