@@ -1,3 +1,11 @@
+# Проверка выпуска 1.2.1
+
+Новые установочные архивы собираются в dist/release-1.2.1. Старый тег 1.2.0 и архивы не меняются. Для новой версии требуется отдельный успешный CI: две runtime-пары, точные ZIP/manifests, обновление с публичной 1.2.0, 009 fixtures и actual admin/browser. Итог CI фиксируется после завершения; тема сайта, физический телефон, SMTP и automatic cron проверяются отдельно.
+
+[Настройки](VISIBILITY_SETTINGS.md) · [Обновление](UPGRADE.md) · [Roadmap](ROADMAP.md).
+
+## Историческая проверка 1.2.0
+
 # Проверки релиза 1.2.0
 
 [Стабильный релиз 1.2.0](https://github.com/omhotey/WP-NetChat/releases/tag/v1.2.0) опубликован. Основание проверки кода: успешный [GitHub Actions 38446870987](https://github.com/omhotey/WP-NetChat/actions/runs/38446870987) на [ревизии 521678f138a33ebd057c764d298ec63fdd117104](https://github.com/omhotey/WP-NetChat/commit/521678f138a33ebd057c764d298ec63fdd117104). Тег и принятие после merge относятся к исходному дереву релиза; последующие правки документации не являются новым испытанием runtime.

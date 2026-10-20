@@ -157,9 +157,25 @@ function netchat_admin_page() {
 
                 <!-- Appearance -->
                 <div class="nc-card nc-card-launcher"><div class="nc-card-title">Поведение кнопки</div><div class="nc-launcher-options">
-                    <label><input type="radio" name="nc-launcher-mode" value="form" <?php checked($c['launcher_mode'],'form'); ?>><span><strong>Только форма</strong><small>Одна кнопка сразу открывает попап. Мессенджеры доступны внутри.</small></span></label>
+                    <label><input type="radio" name="nc-launcher-mode" value="form" <?php checked($c['launcher_mode'],'form'); ?>><span><strong>Только форма</strong><small>Одна кнопка сразу открывает форму. Мессенджеры доступны внутри.</small></span></label>
                     <label><input type="radio" name="nc-launcher-mode" value="menu" <?php checked($c['launcher_mode'],'menu'); ?>><span><strong>Форма и мессенджеры</strong><small>Кнопка раскрывает меню: форма сверху, каналы связи ниже.</small></span></label>
                 </div><a class="nc-form-settings-link" href="<?php echo esc_url(admin_url('admin.php?page=netchat-service-forms')); ?>">Выбрать основную / общую форму</a><p class="nc-launcher-help">Привязка страницы выбирает её форму. Без привязки используется настройка главной. Когда приём форм выключен, доступны только мессенджеры.</p></div>
+
+                <div class="nc-card"><div class="nc-card-title">Открытие формы</div>
+                    <label for="nc-form-presentation">Вид формы</label>
+                    <select id="nc-form-presentation">
+                        <option value="modal" <?php selected($c['form_presentation'],'modal'); ?>>Модальное окно</option>
+                        <option value="drawer" <?php selected($c['form_presentation'],'drawer'); ?>>Боковая панель</option>
+                    </select>
+                    <div id="nc-drawer-side-row" <?php if($c['form_presentation']!=='drawer')echo 'hidden'; ?>>
+                        <label for="nc-form-drawer-side">Сторона панели</label>
+                        <select id="nc-form-drawer-side">
+                            <option value="left" <?php selected($c['form_drawer_side'],'left'); ?>>Слева</option>
+                            <option value="right" <?php selected($c['form_drawer_side'],'right'); ?>>Справа</option>
+                        </select>
+                    </div>
+                    <p>Сторона панели не зависит от положения кнопки. Контакты внизу формы всегда раскрыты.</p>
+                </div>
                 <div class="nc-card nc-card-appearance">
                     <div class="nc-card-title">&#127912; <?php echo nc_t( 'APPEARANCE', 'ВНЕШНИЙ ВИД' ); ?></div>
                     <div class="nc-ap-row">
@@ -193,6 +209,10 @@ function netchat_admin_page() {
                         </label>
                         <span class="nc-greeting-label"><?php echo nc_t( 'Show message', 'Показывать сообщение' ); ?></span>
                     </div>
+                    <label class="nc-vis-check" for="nc-opt-hmobile">
+                        <input type="checkbox" id="nc-opt-hmobile"<?php checked(!empty($c['hint_mobile'])); ?>>
+                        <em><?php echo nc_t('Show greeting on phones','Показывать подсказку на телефонах'); ?></em>
+                    </label>
                     <div class="nc-greeting-fields<?php echo $show_greeting ? ' visible' : ' hidden'; ?>" id="nc-greeting-fields">
                         <div class="nc-editor-toolbar">
                             <button type="button" class="nc-editor-btn" data-action="bold" title="Bold"><b>B</b></button>
@@ -205,12 +225,12 @@ function netchat_admin_page() {
                         <div class="nc-scroll-setting">
                             <label for="nc-opt-hscroll"><?php echo nc_t('Greeting after page scroll (%)','Приветствие после прокрутки страницы (%)'); ?></label>
                             <input type="number" id="nc-opt-hscroll" value="<?php echo esc_attr($c['hint_scroll_percent']); ?>" min="0" max="100" step="1" required aria-describedby="nc-hscroll-help">
-                            <small id="nc-hscroll-help"><?php echo nc_t('0: no scroll delay; 100: end of page. The delay starts after both thresholds.','0 — без ожидания прокрутки; 100 — конец страницы. Задержка отсчитывается после достижения обоих порогов.'); ?></small>
+                            <small id="nc-hscroll-help"><?php echo nc_t('0: no scroll wait; 100: end of page. Time is measured from page navigation; both conditions are required.','0 — без ожидания прокрутки; 100 — конец страницы. Время отсчитывается от открытия страницы; оба условия обязательны.'); ?></small>
                         </div>
                         <div class="nc-greeting-delay">
-                            <label><?php echo nc_t( 'Show delay', 'Задержка появления' ); ?></label>
+                            <label for="nc-opt-hd"><?php echo nc_t( 'Greeting time from page navigation', 'Подсказка: время от открытия страницы' ); ?></label>
                             <div class="nc-delay-wrap">
-                                <input type="number" id="nc-opt-hd" value="<?php echo esc_attr( $c['hint_delay'] ?? 2 ); ?>" min="0" max="30" step="1">
+                                <input type="number" id="nc-opt-hd" value="<?php echo esc_attr( $c['hint_delay'] ?? 2 ); ?>" min="0" max="600" step="1" required>
                                 <span class="nc-delay-unit"><?php echo nc_t( 'sec', 'сек' ); ?></span>
                             </div>
                         </div>
@@ -220,6 +240,11 @@ function netchat_admin_page() {
                 <!-- Visibility -->
                 <div class="nc-card nc-card-visibility">
                     <div class="nc-card-title">&#128065; <?php echo nc_t( 'VISIBILITY', 'ВИДИМОСТЬ' ); ?></div>
+                    <div class="nc-scroll-setting">
+                        <label for="nc-opt-bd"><?php echo nc_t('Button time from page navigation (seconds)','Кнопка: время от открытия страницы (секунды)'); ?></label>
+                        <input type="number" id="nc-opt-bd" value="<?php echo esc_attr($c['button_delay']); ?>" min="0" max="600" step="1" required aria-describedby="nc-bd-help">
+                        <small id="nc-bd-help"><?php echo nc_t('0: no time wait. Appears once the time has elapsed and the chosen scroll percentage is reached.','0 — без ожидания времени. Появится, когда пройдёт заданное время и будет достигнут указанный процент прокрутки.'); ?></small>
+                    </div>
                     <div class="nc-scroll-setting">
                         <label for="nc-opt-bscroll"><?php echo nc_t('Button after page scroll (%)','Кнопка после прокрутки страницы (%)'); ?></label>
                         <input type="number" id="nc-opt-bscroll" value="<?php echo esc_attr($c['button_scroll_percent']); ?>" min="0" max="100" step="1" required aria-describedby="nc-bscroll-help">
@@ -264,7 +289,7 @@ function netchat_admin_page() {
 /** Full settings replacement. WP core authenticates cookie/nonces before permissions. */
 add_action( 'rest_api_init', function () {
     $args = array();
-    foreach ( netchat_defaults() as $key => $value ) $args[$key] = array( 'required' => !in_array($key,array('launcher_mode','button_scroll_percent','hint_scroll_percent'),true) );
+    foreach ( netchat_defaults() as $key => $value ) $args[$key] = array( 'required' => !in_array($key,array('launcher_mode','button_scroll_percent','hint_scroll_percent','form_presentation','form_drawer_side','hint_mobile','button_delay'),true) );
     $args['revision'] = array( 'required' => true, 'type' => 'integer', 'minimum' => 1 );
     register_rest_route( 'netchat/v1', '/settings', array(
         'methods' => 'POST', 'callback' => 'netchat_rest_save',
@@ -279,7 +304,7 @@ function netchat_rest_save( $request ) {
     }
     $revision = $data['revision']; unset( $data['revision'] );
     $current=netchat_get_config();
-    foreach(array('launcher_mode','button_scroll_percent','hint_scroll_percent')as$key)if(!array_key_exists($key,$data))$data[$key]=$current[$key];
+    foreach(array('launcher_mode','button_scroll_percent','hint_scroll_percent','form_presentation','form_drawer_side','hint_mobile','button_delay')as$key)if(!array_key_exists($key,$data))$data[$key]=$current[$key];
     $config = netchat_normalize_config( $data, true );
     if ( is_wp_error( $config ) ) return $config;
     $old_lang = netchat_get_config()['lang'];

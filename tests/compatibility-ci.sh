@@ -3,7 +3,7 @@
 set -euo pipefail
 [[ ${CI:-} == true && ${GITHUB_ACTIONS:-} == true ]] || { echo 'Hosted GitHub Actions worker required' >&2; exit 1; }
 source_dir=$(cd "$(dirname "$0")/.." && pwd)
-release_dir="$source_dir/dist/release-1.2.0"
+release_dir="$source_dir/dist/release-1.2.1"
 case "${NETCHAT_WP_VERSION:?}/${NETCHAT_PHP_VERSION:?}" in 5.0/7.2|7.1.3/8.3) ;; *) echo 'Unreviewed runtime pair' >&2; exit 1 ;; esac
 [[ ${NETCHAT_DB_NAME:?} == netchat_ci ]] || { echo 'Unexpected disposable database' >&2; exit 1; }
 php -r 'if (PHP_MAJOR_VERSION . "." . PHP_MINOR_VERSION !== getenv("NETCHAT_PHP_VERSION")) { fwrite(STDERR,"PHP version mismatch\n"); exit(1); } echo "PHP " . PHP_VERSION . "\n";'
@@ -13,7 +13,7 @@ release, source = map(pathlib.Path, sys.argv[1:])
 for name, root in [('netchat-wp', 'netchat'), ('netchat-upgrade-WP-NetChat-main', 'WP-NetChat-main')]:
     manifest = json.loads((release / (name + '.manifest.json')).read_text())
     archive = release / (name + '.zip')
-    assert manifest['version'] == '1.2.0' and manifest['plugin_root'] == root
+    assert manifest['version'] == '1.2.1' and manifest['plugin_root'] == root
     assert manifest['archive'] == archive.name
     assert hashlib.sha256(archive.read_bytes()).hexdigest() == manifest['sha256']
     expected = {f['path']: f for f in manifest['files']}
@@ -98,6 +98,9 @@ php -l "$source_dir/tests/service-forms-storage.php"
 [[ -x /bin/true && -x /bin/false ]] || { echo 'Deterministic mail fixtures unavailable' >&2; exit 1; }
 /bin/true
 if /bin/false; then echo 'Failure mail fixture returned success' >&2; exit 1; fi
+node "$source_dir/tests/visibility-009.test.mjs" --php-bundle | php
+node "$source_dir/tests/visibility-009.test.mjs"
+node "$source_dir/tests/visibility-009-admin.test.mjs"
 node "$source_dir/tests/normalization.test.cjs"
 node "$source_dir/tests/distribution-privacy.test.cjs"
 for suite in wp-integration.php leads-storage.php service-forms-storage.php forms-editor-storage.php forms-lifecycle-storage.php data-transfer-storage.php; do
@@ -106,6 +109,7 @@ done
 curl --fail --location --retry 3 --output "$release_dir/historical-v1.0.0.zip" https://github.com/omhotey/WP-NetChat/releases/download/v1.0.0/WP-NetChat-main.zip
 echo "ead4077f9a746370715d286546927f449e2b28ef3434f03c1a9c587fd1d38b7d  $release_dir/historical-v1.0.0.zip" | sha256sum --check
 NETCHAT_CORE_DIR="$core" NETCHAT_RELEASE_DIR="$release_dir" bash "$source_dir/tests/release-smoke.sh"
+NETCHAT_CORE_DIR="$core" NETCHAT_RELEASE_DIR="$release_dir" bash "$source_dir/tests/release-121-upgrade.sh"
 wp --path="$core" --skip-plugins --skip-themes eval 'global $wpdb; $tables=$wpdb->get_col($wpdb->prepare("SHOW TABLES LIKE %s","nc_release_%")); if ($wpdb->last_error || $tables) { WP_CLI::error("Smoke fixture cleanup failed"); } echo "PASS smoke database cleanup\n";'
 # Every browser record/page below lives only in this disposable core/database.
 wp --path="$core" option update home http://localhost:8080

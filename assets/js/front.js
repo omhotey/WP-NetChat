@@ -9,29 +9,45 @@
         if (!t || !b || !wrap) return;
         var cfg = window.netchat || {};
         var formFirst = t.hasAttribute('data-netchat-open');
-        var open = false, hintTimer, closeTimer, hintDismissed = false, hintScheduled = false;
+        var open = false, hintTimer, buttonTimer, closeTimer, hintDismissed = false;
+        var hintHadFocus = false;
         var buttonReached = false, hintReached = false, frame = 0;
         var buttonPercent = Number(cfg.buttonScrollPercent) || 0, hintPercent = Number(cfg.hintScrollPercent) || 0;
-        function hideHint() { if(h){h.hidden=true;h.classList.remove('nc-visible');} }
-        function stopHint() { hintDismissed=true;clearTimeout(hintTimer);hideHint(); }
         function buttonAccessible() { return !t.hidden && t.getClientRects().length>0 && window.getComputedStyle(t).visibility!=='hidden'; }
+        function hideHint() {
+            if(!h)return;
+            if(h.contains(document.activeElement)||hintHadFocus){
+                hintHadFocus=false;
+                if(buttonAccessible())t.focus({preventScroll:true});
+                else if(document.activeElement.blur)document.activeElement.blur();
+            }
+            h.hidden=true;h.classList.remove('nc-visible');
+        }
+        function stopHint() { hintDismissed=true;clearTimeout(hintTimer);hideHint(); }
+        var initializedAt=Date.now();
+        function navigationElapsed() {
+            if(window.performance&&typeof window.performance.now==='function')return Math.max(0,window.performance.now());
+            var start=window.performance&&window.performance.timing&&window.performance.timing.navigationStart;
+            return Math.max(0,Date.now()-(start||initializedAt));
+        }
+        function hintAllowed() { return hintMobile || window.innerWidth>768; }
         function checkProgress() {
-            frame=0;
+            frame=0;clearTimeout(buttonTimer);clearTimeout(hintTimer);
             var doc=document.scrollingElement||document.documentElement;
             var distance=Math.max(doc.scrollHeight,document.body.scrollHeight)-window.innerHeight;
             var progress=distance<=0?100:Math.max(0,Math.min(100,100*Math.max(0,window.pageYOffset||doc.scrollTop||0)/distance));
             buttonReached=buttonReached||progress>=buttonPercent;
             hintReached=hintReached||progress>=hintPercent;
-            if(buttonReached){t.hidden=false;wrap.classList.remove('nc-scroll-wait');}
-            if(!h||hintDismissed||!hintReached)return;
-            if(!buttonAccessible()){clearTimeout(hintTimer);hintScheduled=false;hideHint();return;}
+            var elapsed=navigationElapsed(),buttonReady=buttonReached&&elapsed>=buttonDelay;
+            t.hidden=!buttonReady;
+            if(buttonReady)wrap.classList.remove('nc-scroll-wait');
+            if(elapsed<buttonDelay)buttonTimer=setTimeout(checkProgress,buttonDelay-elapsed);
+            if(!h||hintDismissed){hideHint();return;}
             if(open||document.querySelector('#nc-leads-modal:not([hidden])')){stopHint();return;}
-            if(!hintScheduled){hintScheduled=true;hintTimer=setTimeout(function(){
-                if(hintDismissed)return;
-                if(!buttonAccessible()){hintScheduled=false;return;}
-                if(open||document.querySelector('#nc-leads-modal:not([hidden])')){stopHint();return;}
-                h.hidden=false;h.classList.add('nc-visible');
-            },hintDelay);}
+            if(!hintAllowed()){hideHint();return;}
+            if(elapsed<hintDelay)hintTimer=setTimeout(checkProgress,hintDelay-elapsed);
+            if(!hintReached||elapsed<hintDelay||!buttonAccessible()){hideHint();return;}
+            h.hidden=false;h.classList.add('nc-visible');
         }
         function scheduleProgress() { if(!frame)frame=window.requestAnimationFrame(checkProgress); }
         var motion = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
@@ -40,7 +56,9 @@
             var n = Number(value);
             return isFinite(n) && n >= 0 ? n : fallback;
         }
-        var speed = duration(cfg.speed, 300), hintDelay = duration(cfg.hintDelay, 2000);
+        var speed = duration(cfg.speed, 300), hintDelay = duration(cfg.hintDelay, 2000), buttonDelay = duration(cfg.buttonDelay, 0);
+        var hintMobile = cfg.hintMobile===1 || cfg.hintMobile===true || cfg.hintMobile==='1';
+        if(h)h.classList.toggle('nc-hint-no-mobile',!hintMobile);
         wrap.style.setProperty('--nc-duration', speed + 'ms');
         if (speed === 0) wrap.classList.add('nc-no-motion');
         function buttons() { return b.querySelectorAll('.nc-btn'); }
@@ -110,6 +128,12 @@
         });
         b.addEventListener('click', function (e) { if (e.target.closest('.nc-btn')) closeTimer = setTimeout(closeMenu, 150); });
         if (h) {
+            h.addEventListener('focusin',function(){hintHadFocus=true;});
+            h.addEventListener('focusout',function(e){
+                // CSS may blur a phone-disabled hint before the resize callback.
+                if(!hintAllowed()&&(!e.relatedTarget||e.relatedTarget===document.body))return;
+                hintHadFocus=!!(e.relatedTarget&&h.contains(e.relatedTarget));
+            });
             document.addEventListener('netchat:form-open',stopHint);
             function dismissHint() { stopHint(); if(h.contains(document.activeElement)&&buttonAccessible())t.focus(); }
             h.querySelector('.nc-hint-close').addEventListener('click',function(e){e.stopPropagation();dismissHint();});

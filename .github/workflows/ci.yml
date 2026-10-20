@@ -20,10 +20,10 @@ jobs:
           name: release-packages
           if-no-files-found: error
           path: |
-            dist/release-1.2.0/netchat-wp.zip
-            dist/release-1.2.0/netchat-wp.manifest.json
-            dist/release-1.2.0/netchat-upgrade-WP-NetChat-main.zip
-            dist/release-1.2.0/netchat-upgrade-WP-NetChat-main.manifest.json
+            dist/release-1.2.1/netchat-wp.zip
+            dist/release-1.2.1/netchat-wp.manifest.json
+            dist/release-1.2.1/netchat-upgrade-WP-NetChat-main.zip
+            dist/release-1.2.1/netchat-upgrade-WP-NetChat-main.manifest.json
   runtime:
     needs: package
     runs-on: ubuntu-22.04
@@ -67,7 +67,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: release-packages
-          path: dist/release-1.2.0
+          path: dist/release-1.2.1
       - name: Actual core, integration and exact ZIP runtime checks
         env:
           NETCHAT_WP_VERSION: ${{ matrix.wordpress }}
@@ -88,12 +88,12 @@ jobs:
           name: public-browser-${{ matrix.wordpress }}-php-${{ matrix.php }}
           if-no-files-found: ignore
           path: |
-            dist/release-1.2.0/browser/verification.json
-            dist/release-1.2.0/browser/*.png
-            dist/release-1.2.0/transfer-browser/verification.json
-            dist/release-1.2.0/transfer-browser/*.png
-            dist/release-1.2.0/scroll-browser/verification.json
-            dist/release-1.2.0/scroll-browser/*.png
+            dist/release-1.2.1/browser/verification.json
+            dist/release-1.2.1/browser/*.png
+            dist/release-1.2.1/transfer-browser/verification.json
+            dist/release-1.2.1/transfer-browser/*.png
+            dist/release-1.2.1/scroll-browser/verification.json
+            dist/release-1.2.1/scroll-browser/*.png
   javascript:
     runs-on: ubuntu-22.04
     steps:

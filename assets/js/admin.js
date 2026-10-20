@@ -44,6 +44,8 @@
         return {
             channels:   channels,
             leads:      collectLeads(),
+            form_presentation: document.getElementById('nc-form-presentation')?.value || netchatAdmin.config.form_presentation || 'modal',
+            form_drawer_side: document.getElementById('nc-form-drawer-side')?.value || netchatAdmin.config.form_drawer_side || 'left',
             launcher_mode: document.querySelector('[name="nc-launcher-mode"]:checked')?.value || netchatAdmin.config.launcher_mode || 'form',
             pos_right:  !isLeft && posRightEl ? posRightEl.value : '',
             pos_bottom: posBottomEl ? posBottomEl.value : '30',
@@ -54,6 +56,8 @@
             h:          hEl ? hEl.checked : false,
             ht:         htEl ? htEl.value : '',
             hd:         hdEl ? Number(hdEl.value) : 2,
+            hint_mobile: document.getElementById('nc-opt-hmobile')?.checked ?? !!netchatAdmin.config.hint_mobile,
+            button_delay: document.getElementById('nc-opt-bd')?.value ?? netchatAdmin.config.button_delay ?? 0,
             button_scroll_percent: document.getElementById('nc-opt-bscroll')?.value ?? netchatAdmin.config.button_scroll_percent,
             hint_scroll_percent: document.getElementById('nc-opt-hscroll')?.value ?? netchatAdmin.config.hint_scroll_percent,
             d:          dEl ? dEl.checked : false,
@@ -71,15 +75,17 @@
             settings.leads = s.leads;
             return settings;
         }
-        ['nc-opt-bscroll','nc-opt-hscroll'].forEach(function(id){
+        ['nc-opt-bscroll','nc-opt-hscroll','nc-opt-bd','nc-opt-hd'].forEach(function(id){
             var input=document.getElementById(id);
-            if(input&&!input.checkValidity()){input.setAttribute('aria-invalid','true');input.reportValidity();input.focus();throw new Error('Введите целое число от 0 до 100: '+document.querySelector('label[for="'+id+'"]').textContent);}
+            if(input&&!input.checkValidity()){input.setAttribute('aria-invalid','true');input.reportValidity();input.focus();throw new Error('Введите целое число от 0 до '+input.max+': '+document.querySelector('label[for="'+id+'"]').textContent);}
             if(input)input.removeAttribute('aria-invalid');
         });
         var data = {
             revision: netchatAdmin.revision,
             leads: s.leads,
             launcher_mode: s.launcher_mode,
+            form_presentation: s.form_presentation,
+            form_drawer_side: s.form_drawer_side,
             enabled: {},
             links: {},
             position: {
@@ -94,6 +100,8 @@
             hint:       s.h ? 1 : 0,
             hint_text:  s.ht,
             hint_delay: s.hd,
+            hint_mobile: s.hint_mobile ? 1 : 0,
+            button_delay: Number(s.button_delay),
             button_scroll_percent: Number(s.button_scroll_percent),
             hint_scroll_percent: Number(s.hint_scroll_percent),
             desktop:    s.d ? 1 : 0,
@@ -374,6 +382,10 @@
        ------------------------------------------------------------------ */
     document.addEventListener('DOMContentLoaded', function () {
         updateGreetingFields();
+        var presentation=document.getElementById('nc-form-presentation'),side=document.getElementById('nc-drawer-side-row');
+        function drawerSideVisibility(){if(side)side.hidden=!presentation||presentation.value!=='drawer';}
+        if(presentation)presentation.addEventListener('change',drawerSideVisibility);
+        drawerSideVisibility();
         initEventListeners();
     });
 

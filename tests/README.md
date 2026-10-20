@@ -1,3 +1,11 @@
+# Проверки 1.2.1
+
+Изолированные: node tests/visibility-009.test.mjs (108), node tests/visibility-009-admin.test.mjs (44), node tests/visibility-009.test.mjs --php-bundle | php (120). PLAYWRIGHT_MODULE_PATH выбирает установленный Playwright; BROWSER_CHANNEL выбирает браузер. Локально по умолчанию Edge, в GitHub Actions Chromium.
+
+Hosted CI запускает compatibility-ci.sh только на временном worker, проверяет точные ZIP и обновление с публичной 1.2.0 для обеих папок, реальные PHP-rendered настройки, сохранение и мобильный выключатель. release-121-upgrade.sh использует собственный nc_release_ prefix и синтетические данные. Не запускать mutating suites на общем локальном/рабочем WordPress.
+
+## Прежние наборы проверок
+
 # Проверки NetChat
 
 Версия 1.2.0 опубликована. Обе пары — WordPress 5.0 / PHP 7.2 и WordPress 7.1.3 / PHP 8.3 — прошли [запуск 38446870987](https://github.com/omhotey/WP-NetChat/actions/runs/38446870987) для [ревизии 521678f138a33ebd057c764d298ec63fdd117104](https://github.com/omhotey/WP-NetChat/commit/521678f138a33ebd057c764d298ec63fdd117104). Приведённые результаты относятся к этому запуску; CI этой редакции документации имеет отдельные результаты в PR.
@@ -114,3 +122,9 @@ UTM/ID, альтернативные каналы, выключенный кан
 Выходы hosted CI находятся в `dist/release-1.2.0`; браузерные результаты порогов — в `scroll-browser` с синтетическими снимками и verification.json. Общий локальный `-Browser` runner блокируется: исторические наборы сохраняют старые `tests/results`. Запускайте `service-forms-e2e.mjs` отдельно с `NETCHAT_TEST_OUTPUT` под `dist/release-1.2.0`. Full-service-email тест сохраняет проверку полного уведомления независимо от настройки include_message. Закрытие формы не отменяет начатый запрос.
 
 Smoke использует проверенный `historical-v1.0.0.zip` с корнем `WP-NetChat-main` и совместимый ZIP обновления. Локальный результат не заменяет hosted-матрицу. Изменение документации в main сохраняет исходники тестов, CI, код, тег и опубликованные ZIP 1.2.0; новый PR получит собственные результаты CI.
+
+## Изолированные проверки кандидата 1.2.1
+
+Общий tests/run.ps1 выше относится к прежним runtime-сценариям 1.2.0 и не запускается автоматически для этого кандидата. Без общего WordPress выполните node tests/interaction-007.test.mjs. Команда node tests/interaction-007-e2e.mjs использует уже установленный Playwright/Edge (PLAYWRIGHT_MODULE_PATH / BROWSER_CHANNEL), собственный HTML и явно перехваченный синтетический транспорт: это browser fixture, не actual WordPress. Проверяются modal/drawer слева/справа, 320/390/1440, порядок контактов, отсутствие details, пустые контакты, фоны, focus/Escape/inert/scroll/reduced-motion, pending success/503/реальные 20 секунд.
+
+Команда node tests/interaction-007.test.mjs --php-bundle выдаёт чистый PHP в stdout для установленного PHP; standalone режим использует явные WP doubles без SQL и файлов. Файл interaction-007-wp.php на настоящем WordPress требует заранее загруженного кандидата и session-owned TEMPORARY options с префиксом nc007_ и явным nc007_isolated_options. Прямой запуск на общей options запрещён. Отдельное QA-окно и изоляцию готовит Оркестратор; старые mutating SQL/e2e здесь не запускаются. Ни зависимости, ни сервисы не устанавливаются.

@@ -1,10 +1,10 @@
 #requires -Version 7.0
-param([string] $OutputDirectory = (Join-Path $PSScriptRoot '../dist/release-1.2.0'), [ValidateSet('netchat','WP-NetChat-main')][string] $PluginDirectoryName='netchat')
+param([string] $OutputDirectory = (Join-Path $PSScriptRoot '../dist/release-1.2.1'), [ValidateSet('netchat','WP-NetChat-main')][string] $PluginDirectoryName='netchat')
 $ErrorActionPreference='Stop'
 $projectRoot=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $outputRoot=[IO.Path]::GetFullPath($OutputDirectory)
-$approved=[IO.Path]::GetFullPath((Join-Path $projectRoot 'dist/release-1.2.0'))
-if($outputRoot -ne $approved){throw 'Output must be dist/release-1.2.0; existing dist artifacts are protected.'}
+$approved=[IO.Path]::GetFullPath((Join-Path $projectRoot 'dist/release-1.2.1'))
+if($outputRoot -ne $approved){throw 'Output must be dist/release-1.2.1; existing dist artifacts are protected.'}
 $header=Get-Content -LiteralPath (Join-Path $projectRoot 'netchat.php') -Raw
 if($header -notmatch 'Version:\s+([0-9]+\.[0-9]+\.[0-9]+)'){throw 'Plugin version missing.'}
 $version=$Matches[1]
@@ -25,7 +25,7 @@ $manifestPath=Join-Path $outputRoot ($name.Replace('.zip','.manifest.json'))
 $manifestTemp=Join-Path $outputRoot ([guid]::NewGuid().ToString()+'.tmp')
 try{
  $zip=[IO.Compression.ZipArchive]::new([IO.File]::Open($temp,[IO.FileMode]::CreateNew),[IO.Compression.ZipArchiveMode]::Create)
- try{foreach($path in $paths){[void][IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip,(Join-Path $projectRoot $path),"$PluginDirectoryName/$path")}}finally{$zip.Dispose()}
+ try{foreach($path in $paths){$entry=$zip.CreateEntry("$PluginDirectoryName/$path",[IO.Compression.CompressionLevel]::Optimal);$entry.LastWriteTime=[DateTimeOffset]::Parse("2026-10-20T00:00:00Z");$inputStream=[IO.File]::OpenRead((Join-Path $projectRoot $path));try{$entryStream=$entry.Open();try{$inputStream.CopyTo($entryStream)}finally{$entryStream.Dispose()}}finally{$inputStream.Dispose()}}}finally{$zip.Dispose()}
  $read=[IO.Compression.ZipFile]::OpenRead($temp)
  try{
   if($read.Entries.Count -ne $files.Count){throw 'ZIP count mismatch'}

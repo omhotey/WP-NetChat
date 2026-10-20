@@ -2,7 +2,7 @@
 # Run in transient wpcli container. Core/database fixtures use a unique prefix.
 set -eu
 core_dir=${NETCHAT_CORE_DIR:-/var/www/html}
-release_dir=${NETCHAT_RELEASE_DIR:-/var/www/html/wp-content/plugins/netchat/dist/release-1.2.0}
+release_dir=${NETCHAT_RELEASE_DIR:-/var/www/html/wp-content/plugins/netchat/dist/release-1.2.1}
 archive="$release_dir/netchat-wp.zip"
 previous_archive="$release_dir/historical-v1.0.0.zip"
 upgrade_archive="$release_dir/netchat-upgrade-WP-NetChat-main.zip"
@@ -33,7 +33,7 @@ wp --path="$fixture" config set WP_DEBUG_LOG false --raw >/dev/null
 wp --path="$fixture" core install --url=http://netchat-release.test --title='NetChat package fixture' --admin_user=netchat_fixture --admin_password=fixture-only-not-public --admin_email=fixture@example.test --skip-email >/dev/null
 wp --path="$fixture" plugin install "$archive" --activate >/dev/null
 wp --path="$fixture" eval '
-  if (NETCHAT_VER !== "1.2.0") { WP_CLI::error("Wrong package version."); }
+  if (NETCHAT_VER !== "1.2.1") { WP_CLI::error("Wrong package version."); }
   $forms=netchat_service_forms_config();if(count($forms["installed"])!==2||array_keys($forms["installed"])!==array("nc_primary_v1","nc_example_v1")||$forms["primary_form"]!=="nc_primary_v1"||$forms["enabled"]!==0)WP_CLI::error("Fresh public defaults differ");
   $config = netchat_defaults(); $config["links"]["telegram"] = "https://t.me/durov"; $config["enabled"]["telegram"] = 1;
   if (is_wp_error(netchat_save_config($config, netchat_get_revision()))) { WP_CLI::error("Fixture save failed."); }
@@ -68,7 +68,7 @@ if [ -f "$previous_archive" ]; then
   ' >/dev/null
   wp --path="$fixture" plugin install "$upgrade_archive" --force >/dev/null
   wp --path="$fixture" eval '
-    if (NETCHAT_VER !== "1.2.0" || !is_file(NETCHAT_DATA)) { WP_CLI::error("Legacy upgrade source missing."); }
+    if (NETCHAT_VER !== "1.2.1" || !is_file(NETCHAT_DATA)) { WP_CLI::error("Legacy upgrade source missing."); }
     $config = netchat_get_config();
     global $wpdb;if((int)$wpdb->get_var("SELECT COUNT(*) FROM ".$wpdb->prefix."netchat_leads")!==1)WP_CLI::error("Upgrade lost request");
     if(get_option("active_plugins")!==array("WP-NetChat-main/netchat.php"))WP_CLI::error("Upgrade activated a different/second basename");

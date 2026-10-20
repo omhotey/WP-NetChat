@@ -63,6 +63,8 @@
         }
         var send = element('button', 'nc-e-preview-submit', c.button_text); send.type = 'button'; send.dataset.enquiryPreviewSend = ''; preview.append(send);
         if (success) preview.append(element('p', 'nc-e-preview-success', c.success_text));
+        var alternatives=root.querySelector('#nc-enquiry-preview-alternatives');
+        if(alternatives)preview.append(alternatives.content.cloneNode(true));
         if (restore) { var target = preview.querySelector('[data-enquiry-preview-value="' + restore + '"]'); if (target) { target.focus({preventScroll:true}); if (selection !== null && target.setSelectionRange && /^(text|tel)$/.test(target.type)) target.setSelectionRange(selection, selection); } }
     }
     root.addEventListener('click', function (event) {

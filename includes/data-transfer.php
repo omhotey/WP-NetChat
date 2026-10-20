@@ -65,7 +65,8 @@ function netchat_transfer_validate($data){
     if(($data['type']!=='forms')!==array_key_exists('settings',$data)||($data['type']!=='settings')!==array_key_exists('forms',$data))return netchat_transfer_error('Содержимое не соответствует типу файла.');
     if(array_key_exists('settings',$data)){
         $config=netchat_normalize_config($data['settings'],true);if(is_wp_error($config))return $config;
-        $supplied=$data['settings'];foreach(array('button_scroll_percent','hint_scroll_percent')as$key){if(!array_key_exists($key,$supplied))$supplied[$key]=0;else $supplied[$key]=$config[$key];}
+        $supplied=$data['settings'];foreach(array('form_presentation'=>'modal','form_drawer_side'=>'left','hint_mobile'=>0,'button_delay'=>0)as$key=>$fallback)if(!array_key_exists($key,$supplied))$supplied[$key]=$fallback;
+        foreach(array('button_scroll_percent','hint_scroll_percent')as$key){if(!array_key_exists($key,$supplied))$supplied[$key]=0;else $supplied[$key]=$config[$key];}
         // Preserve the existing canonical contract for every older setting.
         if($config!=$supplied)return netchat_transfer_error('Настройки должны быть полными и нормализованными.');
         foreach($supplied as$key=>$value)if($config[$key]!==$value)return netchat_transfer_error('Настройки должны быть полными и нормализованными.');
