@@ -1,5 +1,5 @@
-.nc-contact-alternatives{margin:0 0 22px;padding:0;border:0;font-family:inherit;font-size:13px;color:#526175}
-.nc-contact-alternatives summary{cursor:pointer;line-height:1.5;padding:10px 0;color:#526175;font-size:13px;font-weight:400}
+.nc-contact-alternatives{margin:22px 0 0;padding:0;border:0;font-family:inherit;font-size:13px;color:#526175}
+.nc-contact-alternatives .nc-alternatives-title{margin:0;line-height:1.5;padding:10px 0;color:#526175;font-size:13px;font-weight:400}
 .nc-contact-alternatives nav{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;padding-bottom:8px}
 .nc-contact-alternatives a{display:inline-flex!important;align-items:center;gap:8px;min-height:40px;max-width:100%;padding:7px 11px;border:1px solid #dde3eb;border-radius:7px;background:#fff;color:#334155!important;text-decoration:none!important;font-size:13px;line-height:1.5;box-sizing:border-box}
 .nc-contact-alternatives a:hover{border-color:#93b4ff;background:#f5f8ff}

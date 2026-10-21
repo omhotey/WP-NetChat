@@ -50,6 +50,7 @@ function netchat_service_token_valid($token,$form){
     return (int)$m[1]<=time()+30&&(int)$m[1]>=time()-1200&&hash_equals(netchat_leads_token_signature($m[1].'.'.$m[2].'|'.$form['id'].'|'.$form['schema_version']),$m[3]);
 }
 add_action('wp_enqueue_scripts',function(){
+    if(netchat_ncf_workspace_active())return;
     if(is_admin()||!netchat_service_ready())return;$c=netchat_service_forms_config();
     wp_enqueue_style('netchat-services',NETCHAT_URL.'assets/css/service-forms.css',array('netchat-leads'),NETCHAT_VER.'.'.filemtime(NETCHAT_DIR.'assets/css/service-forms.css'));
     wp_enqueue_script('netchat-services',NETCHAT_URL.'assets/js/service-forms.js',array('netchat-leads'),NETCHAT_VER.'.'.filemtime(NETCHAT_DIR.'assets/js/service-forms.js'),true);

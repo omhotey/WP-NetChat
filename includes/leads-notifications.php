@@ -1,6 +1,7 @@
 <?php
 /** Persistent email attempts. A successful transport handoff is not delivery. */
 if ( ! defined( 'ABSPATH' ) ) exit;
+require_once __DIR__ . '/leads-email.php';
 add_action( 'netchat_lead_created', 'netchat_leads_schedule_notification', 10, 1 );
 add_action( 'netchat_leads_send_notifications', 'netchat_leads_send_notifications' );
 add_action( 'init', 'netchat_leads_schedule_workers' );
@@ -74,14 +75,11 @@ function netchat_leads_send_one_notification( $id ) {
     elseif ( ! $recipients ) { $error = 'missing_recipient'; }
     else {
         $link = add_query_arg( array( 'page' => 'netchat-leads', 'lead' => $id ), admin_url( 'admin.php' ) );
-        $body = sprintf( "New contact request %s\nCreated (UTC): %s\nOpen in the protected admin area:\n%s\n", $lead['public_code'], $lead['created_at'], $link );
-        $service = !empty($lead['submission_json']) ? json_decode($lead['submission_json'],true) : null;
-        if (is_array($service)) $body .= "\n".netchat_leads_service_email($service);
-        elseif ( ! empty( $config['include_message'] ) ) $body .= "\nMessage:\n" . $lead['message'];
-        $headers = array( 'Content-Type: text/plain; charset=UTF-8' );
+        $message = netchat_leads_build_email( $lead, $config, $link );
+        $headers = array( 'Content-Type: text/html; charset=UTF-8' );
         // Let the site's mailer hooks configure From. Never impersonate the visitor.
         if ( ! empty( $lead['email'] ) && is_email( $lead['email'] ) && ! preg_match( '/[\r\n]/', $lead['email'] ) ) $headers[] = 'Reply-To: ' . $lead['email'];
-        try { $sent = wp_mail( $recipients, sprintf( '[NetChat] Contact request %s', $lead['public_code'] ), $body, $headers ); }
+        try { $sent = netchat_leads_mail_message( $recipients, $message, $headers ); }
         catch ( Throwable $exception ) { $sent = false; }
         if ( $sent ) $state = 'sent';
         else { $error = 'transport_failed'; if ( (int) $lead['notification_attempts'] < 3 ) { $state = 'pending'; $next = gmdate( 'Y-m-d H:i:s', time() + ( (int) $lead['notification_attempts'] === 1 ? 300 : 1800 ) ); } }

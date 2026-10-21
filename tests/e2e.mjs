@@ -164,7 +164,7 @@ try {
   assert.ok((await page.locator('.nc-leads-page').innerText()).includes('Передано почтовому механизму'));
   const mailbox=await context.request.get(`http://localhost:${env.MAILPIT_PORT || 8025}/api/v1/messages`);
   assert.equal(mailbox.status(),200);
-  assert.ok((await mailbox.json()).messages.some(m=>m.Subject.includes('Contact request '+intake.data.reference)),'notification captured by Mailpit with public reference');
+  assert.ok((await mailbox.json()).messages.some(m=>m.Subject.includes('Новая заявка №'+intake.data.reference)),'notification captured by Mailpit with public reference');
   const invalidNonce=await context.request.post(origin+'/wp-admin/admin-post.php',{form:{action:'netchat_lead_action',lead_id:leadId,lead_action:'delete',_wpnonce:'invalid'}});
   assert.equal(invalidNonce.status(),403,'invalid admin nonce rejected');
   await Promise.all([page.waitForURL('**notice=saved**'),page.getByRole('button',{name:'Отметить обработанной',exact:true}).click()]);

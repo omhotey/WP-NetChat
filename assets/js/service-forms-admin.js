@@ -124,7 +124,6 @@
         schema.fields.forEach(field => { if (field.condition && !matches(field.condition)) delete answers[field.key]; });
         preview.replaceChildren(node('p','Шаг '+step+' из '+total,'nc-s-progress'),node('h3', step === total ? 'Как с вами связаться' : step === 1 ? schema.title : 'Уточнения'));
         preview.append(node('p', step === total ? 'Оставьте один удобный контакт, чтобы я мог обсудить с вами задачу' : step === 1 ? schema.intro : 'Можно пропустить необязательные вопросы','nc-s-intro'));
-        const alternatives = root.querySelector('#nc-preview-alternatives');if(alternatives)preview.append(alternatives.content.cloneNode(true));
         if (step === total) {
             function contactInput(key,label,required,placeholder,type) {
                 const wrap=node('div',undefined,'nc-s-field'),title=node('label',label),input=node('input');input.id='nc-preview-contact-'+key;title.htmlFor=input.id;
@@ -169,6 +168,7 @@
         else next.addEventListener('click', () => { root.querySelector('[data-preview-step]').value = String(step + 1); render(); });
         actions.append(next);preview.append(actions);
         if (step === total) { const success = node('div', undefined, 'nc-preview-success'); success.append(node('h4', 'После отправки'), node('p', schema.success_text)); preview.append(success); }
+        const alternatives = root.querySelector('#nc-preview-alternatives');if(alternatives)preview.append(alternatives.content.cloneNode(true));
     }
     function activate(key) {
         const valid = [...root.querySelectorAll('[data-editor-tab]')].some(tab => tab.dataset.editorTab === key); if (!valid) key = 'texts';

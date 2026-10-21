@@ -224,7 +224,7 @@
 #netchat .nc-col { position:relative; }
 #netchat .nc-btn { width:var(--nc-size,56px)!important; height:var(--nc-size,56px)!important; min-width:0; min-height:0; transition-duration:var(--nc-duration,300ms); }
 #netchat.nc-form-menu{--nc-channel-size:max(44px,calc(var(--nc-size,56px) * .78));--nc-form-size:max(60px,calc(var(--nc-size,56px) * 1.12))}
-#netchat.nc-form-menu #nc-bubble{align-items:center;gap:12px;padding:12px;background:#fff;border:1px solid #dde3eb;border-radius:14px;box-shadow:0 8px 28px rgba(24,34,48,.12);right:0;left:auto;width:max-content;max-width:calc(100vw - 24px)}
+#netchat.nc-form-menu #nc-bubble{align-items:center;gap:12px;padding:12px;background:transparent;border:0;border-radius:14px;box-shadow:none;right:0;left:auto;width:max-content;max-width:calc(100vw - 24px)}
 #netchat.nc-form-menu .nc-menu-channels{display:flex;flex-direction:column;gap:10px;align-items:center}
 #netchat.nc-form-menu .nc-menu-channels:empty{display:none}
 #netchat.nc-form-menu .nc-menu-channels .nc-btn{width:var(--nc-channel-size)!important;height:var(--nc-channel-size)!important;box-shadow:none}
@@ -256,3 +256,6 @@
     #netchat,#netchat *,#netchat *::before,#netchat *::after { animation:none!important; transition:none!important; }
     #netchat .nc-bubble.nc-open .nc-btn { opacity:1; transform:none; }
 }
+
+/* Keep a disabled phone greeting unfocusable before JS and on viewport changes. */
+@media(max-width:768px){#netchat .nc-hint.nc-hint-no-mobile{display:none!important}}

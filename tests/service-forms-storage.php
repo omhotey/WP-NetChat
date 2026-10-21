@@ -187,7 +187,7 @@ try {
     add_filter('wp_mail',$capture_mail); add_filter('wp_mail_from',$fixture_from); add_action('phpmailer_init',$fixture_transport);
     try { netchat_leads_send_one_notification($legacy_id); } finally { remove_filter('wp_mail',$capture_mail); remove_filter('wp_mail_from',$fixture_from); remove_action('phpmailer_init',$fixture_transport); }
     sf_assert(netchat_leads_get($legacy_id)['notification_status']==='sent','real service mail transport handoff');
-    sf_assert(is_array($captured_service_mail) && strpos($captured_service_mail['message'],'ОТВЕТЫ НА ВОПРОСЫ')!==false && strpos($captured_service_mail['message'],'Пока не знаю')!==false,'real mail path includes service answers even with legacy message toggle off');
+    sf_assert(is_array($captured_service_mail) && strpos($captured_service_mail['message'],'Ответы на вопросы')!==false && strpos($captured_service_mail['message'],'Пока не знаю')!==false,'real mail path includes service answers even with legacy message toggle off');
     sf_assert(strpos($captured_service_mail['subject'],$old['public_code'])!==false && strpos($captured_service_mail['message'],'Visitor+synthetic@example.test')!==false,'mail contains stable reference and contact');
     foreach ( array( '/netchat/v1/leads', '/netchat/v1/leads/' . $response_data['submission_id'] ) as $route ) sf_assert( rest_do_request( new WP_REST_Request( 'GET', $route ) )->get_status() !== 200, 'public GET cannot read service records' );
     $multi_checks = 0;

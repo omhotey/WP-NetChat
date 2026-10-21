@@ -5,11 +5,17 @@
  */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+/** NCF owns the request marker. Read it afresh at every public entry point. */
+function netchat_ncf_workspace_active() {
+    return function_exists('ncf_workspace_active') && ncf_workspace_active();
+}
+
 /**
  * Enqueue assets
  */
 add_action( 'wp_enqueue_scripts', 'netchat_enqueue', 20 );
 function netchat_enqueue() {
+    if ( netchat_ncf_workspace_active() ) return;
     if ( is_admin() || ! netchat_is_active() ) return;
     if ( in_array( $GLOBALS['pagenow'] ?? '', array( 'wp-login.php', 'wp-register.php', 'wp-activate.php' ), true ) ) return;
 
@@ -20,6 +26,8 @@ function netchat_enqueue() {
     wp_localize_script( 'netchat-front', 'netchat', array(
         'speed'     => intval( $c['animation'] ),
         'hintDelay' => ( intval( $c['hint_delay'] ?? 2 ) ) * 1000,
+        'buttonDelay' => (int)$c['button_delay'] * 1000,
+        'hintMobile' => (int)$c['hint_mobile'],
         'buttonScrollPercent' => (int)$c['button_scroll_percent'],
         'hintScrollPercent' => (int)$c['hint_scroll_percent'],
         'color'     => $c['color'],
@@ -32,6 +40,7 @@ function netchat_enqueue() {
  */
 add_action( 'wp_footer', 'netchat_render', 99 );
 function netchat_render() {
+    if ( netchat_ncf_workspace_active() ) return;
     if ( ! netchat_is_active() ) return;
     $c = netchat_get_config();
     $m = netchat_messengers();
@@ -59,7 +68,7 @@ function netchat_render() {
 
     // Visibility classes
     $cls = ( $at_left ? ' nc-at-left' : '' ) . ( $at_top ? ' nc-at-top' : '' );
-    if((int)$c['button_scroll_percent']>0)$cls.=' nc-scroll-wait';
+    if((int)$c['button_scroll_percent']>0 || (int)$c['button_delay']>0)$cls.=' nc-scroll-wait';
     if($form_first)$cls.=' nc-form-first';
     elseif($has_form)$cls.=' nc-form-menu';
     if ( empty( $c['desktop'] ) && ! empty( $c['mobile'] ) ) $cls .= ' nc-hide-desktop';
@@ -96,11 +105,11 @@ function netchat_render() {
                 <?php echo $bubble_html; // phpcs:ignore ?>
             </div>
             <div class="nc-main-wrap">
-                <button type="button" class="nc-btn nc-main<?php if($form_first)echo ' nc-form'; ?>" id="nc-toggle"<?php if((int)$c['button_scroll_percent']>0)echo ' hidden'; ?> aria-label="<?php echo $form_first?esc_attr($form_label):esc_attr__( 'Open contact menu', 'netchat' ); ?>" aria-controls="<?php echo $form_first?'nc-leads-modal':'nc-bubble'; ?>" aria-expanded="false"<?php if($form_first)echo ' aria-haspopup="dialog" data-netchat-open="form"'.$service_attrs; ?>>
+                <button type="button" class="nc-btn nc-main<?php if($form_first)echo ' nc-form'; ?>" id="nc-toggle"<?php if((int)$c['button_scroll_percent']>0 || (int)$c['button_delay']>0)echo ' hidden'; ?> aria-label="<?php echo $form_first?esc_attr($form_label):esc_attr__( 'Open contact menu', 'netchat' ); ?>" aria-controls="<?php echo $form_first?'nc-leads-modal':'nc-bubble'; ?>" aria-expanded="false"<?php if($form_first)echo ' aria-haspopup="dialog" data-netchat-open="form"'.$service_attrs; ?>>
                     <?php if($form_first): ?><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6Zm0 0v6h6M8 13h8M8 17h5"/></svg><?php else: ?><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="6" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="18" r="2"/></svg><?php endif; ?>
                 </button>
                 <?php if ( ! empty( $c['hint'] ) && ! empty( $c['hint_text'] ) ) : ?>
-                <div class="nc-hint" id="nc-hint" hidden><div class="nc-hint-content"><?php echo wp_kses_post( $c['hint_text'] ); ?></div><button type="button" class="nc-hint-close" aria-label="<?php echo esc_attr(nc_t('Dismiss greeting','Скрыть приветствие')); ?>">&times;</button></div>
+                <div class="nc-hint<?php if(empty($c['hint_mobile']))echo ' nc-hint-no-mobile'; ?>" id="nc-hint" hidden><div class="nc-hint-content"><?php echo wp_kses_post( $c['hint_text'] ); ?></div><button type="button" class="nc-hint-close" aria-label="<?php echo esc_attr(nc_t('Dismiss greeting','Скрыть приветствие')); ?>">&times;</button></div>
                 <?php endif; ?>
             </div>
         </div>
@@ -113,6 +122,7 @@ function netchat_render() {
  */
 add_action( 'wp_enqueue_scripts', 'netchat_inline_css', 30 );
 function netchat_inline_css() {
+    if ( netchat_ncf_workspace_active() ) return;
     if ( ! netchat_is_active() ) return;
     $c = netchat_get_config();
     $size = intval( $c['size'] );

@@ -67,7 +67,7 @@ function netchat_normalize_config( $input, $strict = true ) {
     if ( $strict && array_diff( array_keys( $input ), array_keys( $defaults ) ) ) return netchat_invalid_config( 'unknown field' );
     $result = $defaults;
     foreach ( $defaults as $key => $default ) {
-        if ( ! array_key_exists( $key, $input ) ) { if ( $strict && ! in_array( $key, array( 'launcher_mode', 'button_scroll_percent', 'hint_scroll_percent' ), true ) ) return netchat_invalid_config( $key ); continue; }
+        if ( ! array_key_exists( $key, $input ) ) { if ( $strict && ! in_array( $key, array( 'launcher_mode', 'button_scroll_percent', 'hint_scroll_percent', 'form_presentation', 'form_drawer_side', 'hint_mobile', 'button_delay' ), true ) ) return netchat_invalid_config( $key ); continue; }
         $value = $input[$key];
         if ( 'leads' === $key ) {
             $leads = netchat_leads_normalize_settings( $value, $strict );
@@ -93,11 +93,11 @@ function netchat_normalize_config( $input, $strict = true ) {
                     $result[$key][$sub] = (string) (int) $item;
                 }
             }
-        } elseif ( in_array( $key, array( 'desktop', 'mobile', 'hint' ), true ) ) {
+        } elseif ( in_array( $key, array( 'desktop', 'mobile', 'hint', 'hint_mobile' ), true ) ) {
             if ( ! in_array( $value, array( 0, 1, '0', '1', false, true ), true ) ) { if ( $strict ) return netchat_invalid_config( $key ); continue; }
             $result[$key] = (int) $value;
-        } elseif ( in_array( $key, array( 'size', 'animation', 'hint_delay', 'button_scroll_percent', 'hint_scroll_percent' ), true ) ) {
-            $bounds = array( 'size'=>array(40,80), 'animation'=>array(0,1000), 'hint_delay'=>array(0,30), 'button_scroll_percent'=>array(0,100), 'hint_scroll_percent'=>array(0,100) );
+        } elseif ( in_array( $key, array( 'size', 'animation', 'hint_delay', 'button_delay', 'button_scroll_percent', 'hint_scroll_percent' ), true ) ) {
+            $bounds = array( 'size'=>array(40,80), 'animation'=>array(0,1000), 'hint_delay'=>array(0,600), 'button_delay'=>array(0,600), 'button_scroll_percent'=>array(0,100), 'hint_scroll_percent'=>array(0,100) );
             if ( ! ( ( is_int( $value ) || is_string( $value ) ) && preg_match( '/^\d+$/', (string) $value ) ) ) { if ( $strict ) return netchat_invalid_config( $key ); continue; }
             $number = (int) $value;
             if ( $strict && ( $number < $bounds[$key][0] || $number > $bounds[$key][1] ) ) return netchat_invalid_config( $key );
@@ -108,6 +108,10 @@ function netchat_normalize_config( $input, $strict = true ) {
         } elseif ( 'color' === $key ) {
             if ( ! is_string( $value ) || ! preg_match( '/^#[0-9a-fA-F]{6}$/', $value ) ) { if ( $strict ) return netchat_invalid_config( $key ); continue; }
             $result[$key] = strtolower( $value );
+        } elseif ( in_array( $key, array('form_presentation','form_drawer_side'), true ) ) {
+            $allowed = $key === 'form_presentation' ? array('modal','drawer') : array('left','right');
+            if (!in_array($value,$allowed,true)) { if($strict)return netchat_invalid_config($key);continue; }
+            $result[$key]=$value;
         } elseif ( 'launcher_mode' === $key ) {
             if(!in_array($value,array('form','menu'),true)){if($strict)return netchat_invalid_config($key);continue;}
             $result[$key]=$value;

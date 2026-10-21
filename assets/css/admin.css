@@ -667,3 +667,6 @@ input[type="number"] {
     .netchat-standalone-page .nc-save-btn,
     .netchat-standalone-page .nc-reset-btn { width:100%;box-sizing:border-box;white-space:normal; }
 }
+
+#nc-drawer-side-row[hidden]{display:none!important}
+#nc-drawer-side-row{margin-top:12px}

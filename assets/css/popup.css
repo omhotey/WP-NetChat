@@ -46,3 +46,14 @@
     #nc-leads-modal .nc-leads-closebar{top:-20px}
     #nc-leads-modal .nc-leads-dialog .nc-leads-closebar .nc-leads-close{width:44px;height:44px;min-height:44px}
 }
+
+/* Drawer shares the same accessible dialog; inline/editor content is unaffected. */
+#nc-leads-modal[data-form-presentation="drawer"]{padding:0;align-items:stretch;justify-content:flex-start}
+#nc-leads-modal[data-form-presentation="drawer"][data-form-drawer-side="right"]{justify-content:flex-end}
+#nc-leads-modal[data-form-presentation="drawer"] .nc-leads-dialog{width:100%;max-width:600px;height:var(--nc-s-vh,100dvh);max-height:var(--nc-s-vh,100dvh);min-height:0;border-radius:0;border:0;overflow-y:auto;overscroll-behavior:contain;padding:calc(24px + env(safe-area-inset-top,0px)) calc(18px + env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) calc(18px + env(safe-area-inset-left,0px));animation:ncDrawerLeft .18s ease-out}
+#nc-leads-modal[data-form-presentation="drawer"][data-form-drawer-side="right"] .nc-leads-dialog{animation-name:ncDrawerRight}
+#nc-leads-modal[data-form-presentation="drawer"] .nc-leads-closebar{top:calc(-24px - env(safe-area-inset-top,0px))}
+#nc-leads-modal[data-form-presentation="drawer"] .nc-s-actions{bottom:calc(-24px - env(safe-area-inset-bottom,0px));padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+@keyframes ncDrawerLeft{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+@keyframes ncDrawerRight{from{transform:translateX(100%)}to{transform:translateX(0)}}
+@media(prefers-reduced-motion:reduce){#nc-leads-modal[data-form-presentation="drawer"] .nc-leads-dialog{animation:none}}

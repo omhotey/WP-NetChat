@@ -16,11 +16,12 @@ function netchat_defaults() {
         'links'     => [ 'telegram'=>'','whatsapp'=>'','messenger'=>'','max'=>'','vk'=>'','viber'=>'','email'=>'','phone'=>'' ],
         'position'  => [ 'top'=>'','right'=>'','bottom'=>'30','left'=>'' ],
         'size'=>56, 'animation'=>300, 'desktop'=>1, 'mobile'=>1,
-        'hint'=>0, 'hint_text'=>'', 'hint_delay'=>2,
+        'hint'=>0, 'hint_text'=>'', 'hint_delay'=>2, 'hint_mobile'=>0, 'button_delay'=>0,
         'button_scroll_percent'=>0, 'hint_scroll_percent'=>0,
         'order'=>'telegram,whatsapp,messenger,max,vk,viber,email,phone',
         'color'=>'#2563eb', 'lang'=>'ru',
         'launcher_mode'=>'form',
+        'form_presentation'=>'modal', 'form_drawer_side'=>'left',
         'leads'=>netchat_leads_defaults(),
     ];
 }

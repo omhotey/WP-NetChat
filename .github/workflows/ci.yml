@@ -10,20 +10,20 @@ jobs:
         shell: pwsh
         run: git config --global core.autocrlf false
       - uses: actions/checkout@v4
-      - name: Build both reviewed plugin roots
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Reproduce the single reviewed installer
         shell: pwsh
-        run: |
-          ./tools/build-release.ps1
-          ./tools/build-release.ps1 -PluginDirectoryName WP-NetChat-main
+        run: python tools/build-release.py
       - uses: actions/upload-artifact@v4
         with:
           name: release-packages
           if-no-files-found: error
           path: |
-            dist/release-1.2.0/netchat-wp.zip
-            dist/release-1.2.0/netchat-wp.manifest.json
-            dist/release-1.2.0/netchat-upgrade-WP-NetChat-main.zip
-            dist/release-1.2.0/netchat-upgrade-WP-NetChat-main.manifest.json
+            dist/release-1.2.2/netchat-wp-1.2.2.zip
+            dist/release-1.2.2/netchat-wp-1.2.2.zip.manifest.json
+            dist/release-1.2.2/SHA256SUMS.txt
   runtime:
     needs: package
     runs-on: ubuntu-22.04
@@ -67,7 +67,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: release-packages
-          path: dist/release-1.2.0
+          path: dist/release-1.2.2
       - name: Actual core, integration and exact ZIP runtime checks
         env:
           NETCHAT_WP_VERSION: ${{ matrix.wordpress }}
@@ -86,14 +86,14 @@ jobs:
         if: always()
         with:
           name: public-browser-${{ matrix.wordpress }}-php-${{ matrix.php }}
-          if-no-files-found: ignore
+          if-no-files-found: error
           path: |
-            dist/release-1.2.0/browser/verification.json
-            dist/release-1.2.0/browser/*.png
-            dist/release-1.2.0/transfer-browser/verification.json
-            dist/release-1.2.0/transfer-browser/*.png
-            dist/release-1.2.0/scroll-browser/verification.json
-            dist/release-1.2.0/scroll-browser/*.png
+            dist/release-1.2.2/browser/verification.json
+            dist/release-1.2.2/browser/*.png
+            dist/release-1.2.2/transfer-browser/verification.json
+            dist/release-1.2.2/transfer-browser/*.png
+            dist/release-1.2.2/scroll-browser/verification.json
+            dist/release-1.2.2/scroll-browser/*.png
   javascript:
     runs-on: ubuntu-22.04
     steps:
