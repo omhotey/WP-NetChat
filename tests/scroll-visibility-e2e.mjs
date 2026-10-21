@@ -4,7 +4,7 @@ import {resolve} from 'node:path';
 import {createRequire} from 'node:module';
 if(process.env.GITHUB_ACTIONS!=='true')throw Error('Hosted disposable WordPress worker required.');
 const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAYWRIGHT_MODULE_PATH||'playwright');
-const origin=process.env.NETCHAT_TEST_ORIGIN||'http://localhost:8080',output=resolve('dist/release-1.2.1/scroll-browser');mkdirSync(output,{recursive:true});
+const origin=process.env.NETCHAT_TEST_ORIGIN||'http://localhost:8080',output=resolve('dist/release-1.2.2/scroll-browser');mkdirSync(output,{recursive:true});
 const browser=await chromium.launch({headless:true}),context=await browser.newContext({viewport:{width:1440,height:900}}),admin=await context.newPage(),page=await context.newPage(),errors=[],checks=[];
 page.on('pageerror',e=>errors.push(e.message));admin.on('pageerror',e=>errors.push('admin: '+e.message));let original,primaryFailure;
 async function config(overrides){await admin.reload({waitUntil:'domcontentloaded'});await admin.waitForFunction(()=>window.netchatAdmin);return admin.evaluate(async overrides=>{const c={...netchatAdmin.config,...overrides};const r=await fetch(netchatAdmin.restUrl,{method:'POST',headers:{'Content-Type':'application/json','X-WP-Nonce':netchatAdmin.restNonce},body:JSON.stringify({...c,revision:netchatAdmin.revision})});const data=await r.json();if(!r.ok)throw Error(JSON.stringify(data));return data.config;},overrides);}

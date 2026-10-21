@@ -3,17 +3,17 @@
 set -euo pipefail
 [[ ${CI:-} == true && ${GITHUB_ACTIONS:-} == true ]] || { echo 'Hosted GitHub Actions worker required' >&2; exit 1; }
 source_dir=$(cd "$(dirname "$0")/.." && pwd)
-release_dir="$source_dir/dist/release-1.2.1"
+release_dir="$source_dir/dist/release-1.2.2"
 case "${NETCHAT_WP_VERSION:?}/${NETCHAT_PHP_VERSION:?}" in 5.0/7.2|7.1.3/8.3) ;; *) echo 'Unreviewed runtime pair' >&2; exit 1 ;; esac
 [[ ${NETCHAT_DB_NAME:?} == netchat_ci ]] || { echo 'Unexpected disposable database' >&2; exit 1; }
 php -r 'if (PHP_MAJOR_VERSION . "." . PHP_MINOR_VERSION !== getenv("NETCHAT_PHP_VERSION")) { fwrite(STDERR,"PHP version mismatch\n"); exit(1); } echo "PHP " . PHP_VERSION . "\n";'
 python3 - "$release_dir" "$source_dir" <<'PY'
 import hashlib, json, pathlib, sys, zipfile
 release, source = map(pathlib.Path, sys.argv[1:])
-for name, root in [('netchat-wp', 'netchat'), ('netchat-upgrade-WP-NetChat-main', 'WP-NetChat-main')]:
-    manifest = json.loads((release / (name + '.manifest.json')).read_text())
+for name, root in [('netchat-wp-1.2.2', 'netchat')]:
+    manifest = json.loads((release / (name + '.zip.manifest.json')).read_text())
     archive = release / (name + '.zip')
-    assert manifest['version'] == '1.2.1' and manifest['plugin_root'] == root
+    assert manifest['version'] == '1.2.2' and manifest['plugin_root'] == root
     assert manifest['archive'] == archive.name
     assert hashlib.sha256(archive.read_bytes()).hexdigest() == manifest['sha256']
     expected = {f['path']: f for f in manifest['files']}
@@ -87,7 +87,7 @@ wp --path="$core" core verify-checksums --version="$NETCHAT_WP_VERSION" --locale
 wp --path="$core" config create --dbname="$NETCHAT_DB_NAME" --dbuser="${NETCHAT_DB_USER:?}" --dbpass="${NETCHAT_DB_PASSWORD:?}" --dbhost="${NETCHAT_DB_HOST:?}" --dbprefix=nc_ci_ --skip-check
 wp --path="$core" config set WP_DEBUG_LOG false --raw
 wp --path="$core" core install --url=http://netchat-ci.test --title='NetChat CI' --admin_user=netchat_ci --admin_password=ci-disposable-only --admin_email=ci@example.test --skip-email
-wp --path="$core" plugin install "$release_dir/netchat-wp.zip"
+wp --path="$core" plugin install "$release_dir/netchat-wp-1.2.2.zip"
 # Suites load the real installed candidate after isolating their own options/tables.
 cp -R "$source_dir/tests" "$core/wp-content/plugins/netchat/tests"
 find "$source_dir/includes" -name '*.php' -print0 | xargs -0 -n 1 php -l
@@ -101,6 +101,7 @@ if /bin/false; then echo 'Failure mail fixture returned success' >&2; exit 1; fi
 node "$source_dir/tests/visibility-009.test.mjs" --php-bundle | php
 node "$source_dir/tests/visibility-009.test.mjs"
 node "$source_dir/tests/visibility-009-admin.test.mjs"
+NETCHAT_TEST_CORE="$core" php "$source_dir/tests/email-notifications.php"
 node "$source_dir/tests/normalization.test.cjs"
 node "$source_dir/tests/distribution-privacy.test.cjs"
 for suite in wp-integration.php leads-storage.php service-forms-storage.php forms-editor-storage.php forms-lifecycle-storage.php data-transfer-storage.php; do

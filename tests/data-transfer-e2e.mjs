@@ -4,7 +4,7 @@ import {resolve} from 'node:path';
 import {createRequire} from 'node:module';
 if(process.env.GITHUB_ACTIONS!=='true')throw Error('Hosted synthetic worker required.');
 const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAYWRIGHT_MODULE_PATH||'playwright');
-const origin=process.env.NETCHAT_TEST_ORIGIN||'http://localhost:8080',output=resolve('dist/release-1.2.1/transfer-browser');mkdirSync(output,{recursive:true});
+const origin=process.env.NETCHAT_TEST_ORIGIN||'http://localhost:8080',output=resolve('dist/release-1.2.2/transfer-browser');mkdirSync(output,{recursive:true});
 const browser=await chromium.launch({headless:true}),context=await browser.newContext(),page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
 let before,originalForms;
 async function api(payload,nonce){return page.evaluate(async args=>{const r=await fetch(netchatTransfer.url,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({action:'netchat_transfer',_nonce:args.nonce||netchatTransfer.nonce,payload:JSON.stringify(args.payload)})});return{status:r.status,data:await r.json()};},{payload,nonce});}

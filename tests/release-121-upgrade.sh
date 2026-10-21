@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Exact public 1.2.0 -> candidate 1.2.1, disposable hosted core only.
+# Exact public 1.2.0 -> candidate 1.2.2, disposable hosted core only.
 set -euo pipefail
 [[ ${CI:-} == true && ${GITHUB_ACTIONS:-} == true ]] || { echo 'Hosted disposable worker required' >&2; exit 1; }
 core=${NETCHAT_CORE_DIR:?}; release=${NETCHAT_RELEASE_DIR:?}
@@ -56,19 +56,27 @@ for root in netchat WP-NetChat-main; do
   $nonce=time().".".bin2hex(random_bytes(16));$lead=netchat_leads_create(array("request_key"=>bin2hex(random_bytes(16)),"token"=>$nonce.".".netchat_leads_token_signature($nonce),"email"=>"fixture@example.test","message"=>"Synthetic retained request"));if(is_wp_error($lead))WP_CLI::error("Fixture lead failed");
  ' >/dev/null
  wp --path="$fixture" eval-file "$fixture/state.php" >/dev/null
- wp --path="$fixture" plugin install "$release/$name.zip" --force >/dev/null
+ if [[ $root != netchat ]]; then
+  wp --path="$fixture" plugin deactivate "$root" >/dev/null
+  [[ ! -e "$fixture/wp-content/plugins/netchat" ]] || exit 1
+  mv "$fixture/wp-content/plugins/$root" "$fixture/wp-content/plugins/netchat"
+  wp --path="$fixture" plugin activate netchat >/dev/null
+  # Only the expected basename changes during the explicit folder transition.
+  wp --path="$fixture" --skip-plugins eval '$p=ABSPATH."retained-state.json";$s=json_decode(file_get_contents($p),true);$s["active_plugins"]=hash("sha256",serialize(array("netchat/netchat.php")));file_put_contents($p,json_encode($s));'
+ fi
+ wp --path="$fixture" plugin install "$release/netchat-wp-1.2.2.zip" --force >/dev/null
  wp --path="$fixture" eval-file "$fixture/state.php" >/dev/null
  wp --path="$fixture" eval '
-  if(NETCHAT_VER!=="1.2.1")WP_CLI::error("Wrong updated version");
+  if(NETCHAT_VER!=="1.2.2")WP_CLI::error("Wrong updated version");
   $c=netchat_get_config();if($c["hint_mobile"]!==0||$c["button_delay"]!==0||$c["hint_delay"]!==17||$c["button_scroll_percent"]!==23||$c["hint_scroll_percent"]!==67)WP_CLI::error("Old values/defaults changed");
   $c["hint_mobile"]=1;$c["button_delay"]=600;$c["hint_delay"]=600;
   if(is_wp_error(netchat_save_config($c,netchat_get_revision())))WP_CLI::error("New settings save failed");
   $new=netchat_get_config(true);if($new["hint_mobile"]!==1||$new["button_delay"]!==600||$new["hint_delay"]!==600)WP_CLI::error("New settings readback failed");
  ' >/dev/null
- echo "PASS active 1.2.0 -> 1.2.1 $root: raw settings, forms, requests, keys, limits, users and active basename unchanged; new settings persist."
- wp --path="$fixture" plugin deactivate "$root" >/dev/null
- wp --path="$fixture" plugin uninstall "$root" >/dev/null
- # Each root starts from old-version settings, never a downgrade of 1.2.1 fields.
+ echo "PASS 1.2.0 -> 1.2.2 from $root: raw settings/forms/data preserved; canonical basename; new settings persist."
+ wp --path="$fixture" plugin deactivate netchat >/dev/null
+ wp --path="$fixture" plugin uninstall netchat >/dev/null
+ # Each root starts from old-version settings, never a downgrade of 1.2.2 fields.
  # Only the exact synthetic fixture core/prefix allocated above is affected.
  wp --path="$fixture" --skip-plugins option delete netchat_settings >/dev/null
  wp --path="$fixture" --skip-plugins option delete netchat_service_forms >/dev/null

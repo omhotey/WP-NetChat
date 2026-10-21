@@ -1,0 +1,308 @@
+{
+  "version": "1.2.2",
+  "archive": "netchat-wp-1.2.2.zip",
+  "plugin_root": "netchat",
+  "sha256": "d485bfadf9dec04443a2131d4311c7d3c1d9f69d73fdbae5b052e2d026acd160",
+  "files": [
+    {
+      "path": "netchat/LICENSE",
+      "sha256": "cb22dca4d00600d321ac54f403143784e40012e4c1d5243d9f0794e55c55ea8c",
+      "size": 17310
+    },
+    {
+      "path": "netchat/assets/css/admin.css",
+      "sha256": "f86f8f04e16e3c3f197a5b5043faab335640278f34fbfba349c3f005391971b7",
+      "size": 15912
+    },
+    {
+      "path": "netchat/assets/css/contact-alternatives.css",
+      "sha256": "9c04f26cbbcffe58c10472f4299127afe3803c4a72b1377757f3dee6294bdf9c",
+      "size": 1478
+    },
+    {
+      "path": "netchat/assets/css/data-transfer.css",
+      "sha256": "bb0486910c91ccce3ebd99d7d32cab165f6b10b57b4ff99b3f9ca21fba510b33",
+      "size": 1057
+    },
+    {
+      "path": "netchat/assets/css/enquiry-editor.css",
+      "sha256": "a24fa4ed0bf12e02e92ae26da59dcca0a04f1c5461e9d0c2dd7b2d35fd2d2135",
+      "size": 10242
+    },
+    {
+      "path": "netchat/assets/css/index.php",
+      "sha256": "8bc1530674ae3f74c2c450b8ef2d4c9c1081e718ab7f804096b4c1917e59d7b9",
+      "size": 30
+    },
+    {
+      "path": "netchat/assets/css/leads-admin.css",
+      "sha256": "4cde5773af22c6a884eade482a10fa5344e56a648f703d39b5ea7e437a49d008",
+      "size": 12814
+    },
+    {
+      "path": "netchat/assets/css/leads.css",
+      "sha256": "ee6dd6f9814e335cd4743bf08a2c15d6829ea23313a1165da94b5df64c3f2531",
+      "size": 4179
+    },
+    {
+      "path": "netchat/assets/css/popup.css",
+      "sha256": "74d648176f38c4a223f12a852fbffdfe3b023fbec61c40a5901b8a51102a4d66",
+      "size": 6989
+    },
+    {
+      "path": "netchat/assets/css/service-forms-admin.css",
+      "sha256": "b4fcd22bb7cee7b215c8791b98435e8b8b4c69db495211932a4c23aabc9e9ddb",
+      "size": 10002
+    },
+    {
+      "path": "netchat/assets/css/service-forms-workspace.css",
+      "sha256": "862c43c33dbf1b677e51cd1bb6c97f099fa837c4373279005b6493c9346265f9",
+      "size": 12692
+    },
+    {
+      "path": "netchat/assets/css/service-forms.css",
+      "sha256": "e650cf2550bad6011422ee3b0d575c6e76864eea3a861df88e6d57167910836e",
+      "size": 3719
+    },
+    {
+      "path": "netchat/assets/css/style.css",
+      "sha256": "d6952a41a30c9c8f8d228568ef660438e634773c6589d0da5b78da20f4ca6465",
+      "size": 10833
+    },
+    {
+      "path": "netchat/assets/img/Email.svg",
+      "sha256": "9af9e86466e8afbe6a196a21d3de808a7dacbc38eb52d2c385e7e414b59babd2",
+      "size": 587
+    },
+    {
+      "path": "netchat/assets/img/FB.svg",
+      "sha256": "f36953bb8718684bba73f056cff8a2e54dc0f91ff7224fc135667ae9ac1d8879",
+      "size": 672
+    },
+    {
+      "path": "netchat/assets/img/Max.svg",
+      "sha256": "1b6ec8d8d15efa4edf1994c0eeec3ea0511e6d5ecf12dba85c4052bf0191f4b6",
+      "size": 790
+    },
+    {
+      "path": "netchat/assets/img/TG.svg",
+      "sha256": "e640a22cd3a9a8d797a00ce634259cfec4216f2d3291b9cc80a097adcc09cc6e",
+      "size": 894
+    },
+    {
+      "path": "netchat/assets/img/Tel.svg",
+      "sha256": "ce6df6db8f8927cdbffada2531a4de21fde4471cae1af100b40a2697936be45d",
+      "size": 766
+    },
+    {
+      "path": "netchat/assets/img/VK.svg",
+      "sha256": "fdfab8d302803842f9add472698eebcee111a73901d0b59ca0f5a4f639bd7d27",
+      "size": 1077
+    },
+    {
+      "path": "netchat/assets/img/Viber.svg",
+      "sha256": "fb49b2380847ce2aaaf365ae67968aa676dd13624733063a26dfcded12c7082f",
+      "size": 1780
+    },
+    {
+      "path": "netchat/assets/img/WhatsUp.svg",
+      "sha256": "5c32821eb6e3feff152fb8ab1b5274a72ae6e170361ecc62d49c3dcffacca07f",
+      "size": 826
+    },
+    {
+      "path": "netchat/assets/img/index.php",
+      "sha256": "8bc1530674ae3f74c2c450b8ef2d4c9c1081e718ab7f804096b4c1917e59d7b9",
+      "size": 30
+    },
+    {
+      "path": "netchat/assets/js/admin.js",
+      "sha256": "4cd4d25b6093cd8d0816312f0e60672b3d097f618e43c08bade32bc77ad65071",
+      "size": 18306
+    },
+    {
+      "path": "netchat/assets/js/data-transfer.js",
+      "sha256": "038400dd1951f96226289cde706c967379788365c0ea242b6e1c415385eb9401",
+      "size": 6569
+    },
+    {
+      "path": "netchat/assets/js/enquiry-editor.js",
+      "sha256": "3526b785592a5c12a5f4d76d5db41ef09368d431db56649e015961b3b84117ca",
+      "size": 7556
+    },
+    {
+      "path": "netchat/assets/js/front.js",
+      "sha256": "552b9f525255622b21aeacf732a56fdac81b2bc58c3ff6633ba3e156d7067a17",
+      "size": 10928
+    },
+    {
+      "path": "netchat/assets/js/index.php",
+      "sha256": "8bc1530674ae3f74c2c450b8ef2d4c9c1081e718ab7f804096b4c1917e59d7b9",
+      "size": 30
+    },
+    {
+      "path": "netchat/assets/js/leads.js",
+      "sha256": "6613505406217909ab09e66920cba2ad9944e6edfb13807fca031a2ce59683cb",
+      "size": 11400
+    },
+    {
+      "path": "netchat/assets/js/service-forms-admin.js",
+      "sha256": "cb31bd5b4edab4c0dae2086bf9e80dd5ae16249e3b3c93ab554132e08ecbd6fa",
+      "size": 28456
+    },
+    {
+      "path": "netchat/assets/js/service-forms.js",
+      "sha256": "e3f01f00655a37e897b80c8a8bbcec9aab9e26c729869c2c475c3e008f06da4f",
+      "size": 23134
+    },
+    {
+      "path": "netchat/assets/js/validation.js",
+      "sha256": "23b0a291253d0c698aaca406f8c57e744f9ea6d3d02a1a3eb83bc922a17ea7f9",
+      "size": 3719
+    },
+    {
+      "path": "netchat/includes/admin.php",
+      "sha256": "b9ed9ca1684fcd9c9698bb824801de7378b17f3a39b86d50fe296298ac49a617",
+      "size": 24747
+    },
+    {
+      "path": "netchat/includes/data-transfer.php",
+      "sha256": "45d0e38ea450c1a665c01e2a262e4b6d232a20eaef19b5aa700cc949963045b7",
+      "size": 27695
+    },
+    {
+      "path": "netchat/includes/frontend.php",
+      "sha256": "583f1c4e83f6caa04140ac757fe3fb2f87945374e63fb0064399d3176b203607",
+      "size": 7808
+    },
+    {
+      "path": "netchat/includes/helpers.php",
+      "sha256": "391724e583e6b310f56322aad636d4aebfc2c96cbe58b04a2b7a854750f8291d",
+      "size": 7868
+    },
+    {
+      "path": "netchat/includes/index.php",
+      "sha256": "8bc1530674ae3f74c2c450b8ef2d4c9c1081e718ab7f804096b4c1917e59d7b9",
+      "size": 30
+    },
+    {
+      "path": "netchat/includes/leads-admin.php",
+      "sha256": "299c128476158e92d5a2d055647f034681a2e1130cea162d83c27dd05377137a",
+      "size": 28895
+    },
+    {
+      "path": "netchat/includes/leads-email.php",
+      "sha256": "6e527db0a66f4b1295244270c35c058be6fd26eeb5cd0530d7e305c77fbc7d9e",
+      "size": 9749
+    },
+    {
+      "path": "netchat/includes/leads-frontend.php",
+      "sha256": "78fc934ef47604176b0cc54ae413abda71d57f62be92296e0a17988261ce6d8f",
+      "size": 8066
+    },
+    {
+      "path": "netchat/includes/leads-notifications.php",
+      "sha256": "2af2788f4b92970186fbd199b5e2c0c4551e609ea82c8119a0eb6a605a4dc9c8",
+      "size": 8682
+    },
+    {
+      "path": "netchat/includes/leads-privacy.php",
+      "sha256": "41a148dd4260326ac1550673b9acc73d2053e39ee04d2f66f004e4d2736f3728",
+      "size": 5859
+    },
+    {
+      "path": "netchat/includes/leads-settings.php",
+      "sha256": "35cdc3e7b799d49f377e3e6909d8c66211ce608102a2e45363537415e85cbd39",
+      "size": 7668
+    },
+    {
+      "path": "netchat/includes/leads.php",
+      "sha256": "bee42b195210e93677fcd45e77566138736cbc47432e015eee0e693d086b0ec2",
+      "size": 27837
+    },
+    {
+      "path": "netchat/includes/normalization.php",
+      "sha256": "9bbac7c3bf37b6e6dd68a84ab3a43033a4a54685260f338992ebfbf46f9a46d1",
+      "size": 9586
+    },
+    {
+      "path": "netchat/includes/service-forms-admin.php",
+      "sha256": "a277858eff3656e6cf5e9b10ce7a9c15e6f3217c5391c449bc23fc03196fba0e",
+      "size": 8312
+    },
+    {
+      "path": "netchat/includes/service-forms-editor.php",
+      "sha256": "d12af93b273e35e8b145431c2092b1609510b44cc7f785dbfac9683faaea20be",
+      "size": 33331
+    },
+    {
+      "path": "netchat/includes/service-forms-lifecycle.php",
+      "sha256": "193119ab649c4050dd9c2f7c8a11e2cf04901a4a0fcfd43e9f4bd7d3d8abb40c",
+      "size": 5460
+    },
+    {
+      "path": "netchat/includes/service-forms-validation.php",
+      "sha256": "e04e4cbd095e2b09efc6df386a7b2bde4057ce040075bdaea99c387eb7e82a74",
+      "size": 16747
+    },
+    {
+      "path": "netchat/includes/service-forms.php",
+      "sha256": "accd068160af048c6f4b91bc82cdc48797f1b3518a80d638ee86a3348c506092",
+      "size": 7622
+    },
+    {
+      "path": "netchat/includes/service-presets.json",
+      "sha256": "617097e6e09de6ae8976c87cbd843b5455d4e8551ff341e454ba0d8522b05fbc",
+      "size": 2031
+    },
+    {
+      "path": "netchat/includes/storage.php",
+      "sha256": "eab18db7e9f4d79dc99a9fa52ed47e3c4444c62285b96f1f7f35514889f230c0",
+      "size": 9492
+    },
+    {
+      "path": "netchat/languages/en_US.mo",
+      "sha256": "757ab10b8cacc78942cbc4559bafaaf8b83167505cb19472f5e67e82145d00d6",
+      "size": 2190
+    },
+    {
+      "path": "netchat/languages/en_US.po",
+      "sha256": "16d15afe9f36f45c7849ee5a6237207433c0d03b987e947c68cb5622036f67c8",
+      "size": 3418
+    },
+    {
+      "path": "netchat/languages/index.php",
+      "sha256": "8bc1530674ae3f74c2c450b8ef2d4c9c1081e718ab7f804096b4c1917e59d7b9",
+      "size": 30
+    },
+    {
+      "path": "netchat/languages/netchat.pot",
+      "sha256": "3e6a7c175ac381149c579c7c71d04174c589f22d5e1ab207a1e52e9a24d6561d",
+      "size": 2871
+    },
+    {
+      "path": "netchat/languages/ru_RU.mo",
+      "sha256": "cb27075e3402b23b3b37262f40dac76d14a2914c56b4dd88a4d78a64aa5b86d2",
+      "size": 4396
+    },
+    {
+      "path": "netchat/languages/ru_RU.po",
+      "sha256": "9865e448461e278edff0c4674d32241ddbfe804a9774e6f3a6db5596adaa3eb4",
+      "size": 3986
+    },
+    {
+      "path": "netchat/netchat.php",
+      "sha256": "9dbad20a554c047674f16d9820be59a559e66f726a746b1ee77e8cc5f96b77b2",
+      "size": 3209
+    },
+    {
+      "path": "netchat/readme.txt",
+      "sha256": "9c94104d8775d7f6156012d6d2166d0ef6798a6a1376f8600004d514e15022ef",
+      "size": 12624
+    },
+    {
+      "path": "netchat/uninstall.php",
+      "sha256": "21fe55efeb78d8042a16865a2a15d0356b813731d9ef9c25ac82921a7cec0b13",
+      "size": 1320
+    }
+  ]
+}
