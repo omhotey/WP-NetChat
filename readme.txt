@@ -5,7 +5,7 @@ Tags: contact, messenger, telegram, whatsapp, callback
 Requires at least: 5.0
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -111,3 +111,7 @@ https://github.com/omhotey/WP-NetChat/actions/runs/38446870987
 
 GPLv2 or later. Автор: omhotey — https://github.com/omhotey
 Промо: https://netchat.vibeservice.ru/
+
+= Загрузка стилей (1.2.3) =
+
+Пять публичных CSS встроены в HTML без изменения содержимого. Для обычных внешних файлов задайте define('NETCHAT_INLINE_STYLES', false); в wp-config.php. После смены режима очистите кеш страниц. Встраивание исключает отдельные запросы CSS, но повторяет их содержимое в HTML при каждом переходе. Внешний режим позволяет браузеру отдельно кешировать CSS. Строгий CSP без разрешения inline требует внешнего режима.

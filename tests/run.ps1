@@ -3,7 +3,7 @@ param([string] $LabRoot = 'D:\Project\WordPress-Lab', [switch] $Browser)
 $ErrorActionPreference = 'Stop'
 if ($Browser) { throw 'General Browser runner writes legacy results. Run service-forms-e2e.mjs separately with NETCHAT_TEST_OUTPUT.' }
 $projectRoot = Split-Path -Parent $PSScriptRoot
-$releaseRoot = Join-Path $projectRoot 'dist/release-1.2.2'
+$releaseRoot = Join-Path $projectRoot 'dist/release-1.2.3'
 $historicalArchive = Join-Path $releaseRoot 'historical-v1.0.0.zip'
 if (-not (Test-Path -LiteralPath $historicalArchive -PathType Leaf)) { throw 'Download and verify historical-v1.0.0.zip as described in tests/README.md before running tests.' }
 if ((Get-FileHash -LiteralPath $historicalArchive -Algorithm SHA256).Hash -ne 'EAD4077F9A746370715D286546927F449E2B28EF3434F03C1A9C587FD1D38B7D') { throw 'Historical v1.0.0 ZIP hash mismatch; stop before running tests.' }

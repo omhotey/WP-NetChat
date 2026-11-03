@@ -3,17 +3,17 @@
 set -euo pipefail
 [[ ${CI:-} == true && ${GITHUB_ACTIONS:-} == true ]] || { echo 'Hosted GitHub Actions worker required' >&2; exit 1; }
 source_dir=$(cd "$(dirname "$0")/.." && pwd)
-release_dir="$source_dir/dist/release-1.2.2"
+release_dir="$source_dir/dist/release-1.2.3"
 case "${NETCHAT_WP_VERSION:?}/${NETCHAT_PHP_VERSION:?}" in 5.0/7.2|7.1.3/8.3) ;; *) echo 'Unreviewed runtime pair' >&2; exit 1 ;; esac
 [[ ${NETCHAT_DB_NAME:?} == netchat_ci ]] || { echo 'Unexpected disposable database' >&2; exit 1; }
 php -r 'if (PHP_MAJOR_VERSION . "." . PHP_MINOR_VERSION !== getenv("NETCHAT_PHP_VERSION")) { fwrite(STDERR,"PHP version mismatch\n"); exit(1); } echo "PHP " . PHP_VERSION . "\n";'
 python3 - "$release_dir" "$source_dir" <<'PY'
 import hashlib, json, pathlib, sys, zipfile
 release, source = map(pathlib.Path, sys.argv[1:])
-for name, root in [('netchat-wp-1.2.2', 'netchat')]:
+for name, root in [('netchat-wp-1.2.3', 'netchat')]:
     manifest = json.loads((release / (name + '.zip.manifest.json')).read_text())
     archive = release / (name + '.zip')
-    assert manifest['version'] == '1.2.2' and manifest['plugin_root'] == root
+    assert manifest['version'] == '1.2.3' and manifest['plugin_root'] == root
     assert manifest['archive'] == archive.name
     assert hashlib.sha256(archive.read_bytes()).hexdigest() == manifest['sha256']
     expected = {f['path']: f for f in manifest['files']}
@@ -87,7 +87,7 @@ wp --path="$core" core verify-checksums --version="$NETCHAT_WP_VERSION" --locale
 wp --path="$core" config create --dbname="$NETCHAT_DB_NAME" --dbuser="${NETCHAT_DB_USER:?}" --dbpass="${NETCHAT_DB_PASSWORD:?}" --dbhost="${NETCHAT_DB_HOST:?}" --dbprefix=nc_ci_ --skip-check
 wp --path="$core" config set WP_DEBUG_LOG false --raw
 wp --path="$core" core install --url=http://netchat-ci.test --title='NetChat CI' --admin_user=netchat_ci --admin_password=ci-disposable-only --admin_email=ci@example.test --skip-email
-wp --path="$core" plugin install "$release_dir/netchat-wp-1.2.2.zip"
+wp --path="$core" plugin install "$release_dir/netchat-wp-1.2.3.zip"
 # Suites load the real installed candidate after isolating their own options/tables.
 cp -R "$source_dir/tests" "$core/wp-content/plugins/netchat/tests"
 find "$source_dir/includes" -name '*.php' -print0 | xargs -0 -n 1 php -l

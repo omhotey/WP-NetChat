@@ -3,7 +3,7 @@
  * Plugin Name: NetChat
  * Plugin URI:  https://github.com/omhotey/WP-NetChat
  * Description: Плавающая кнопка связи с мессенджерами. Telegram, WhatsApp, VK, MAX, Viber, Messenger, Email, Телефон. Автор: omhotey.
- * Version:     1.2.2
+ * Version:     1.2.3
  * Author:      omhotey
  * Author URI:  https://github.com/omhotey
  * License:     GPLv2 or later
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 define( 'NETCHAT_FILE', __FILE__ );
 define( 'NETCHAT_DIR', plugin_dir_path( __FILE__ ) );
 define( 'NETCHAT_URL', plugin_dir_url( __FILE__ ) );
-define( 'NETCHAT_VER', '1.2.2' );
+define( 'NETCHAT_VER', '1.2.3' );
 
 // Load translations
 add_action( 'plugins_loaded', function() {
@@ -27,6 +27,7 @@ add_action( 'plugins_loaded', function() {
 } );
 
 // Load plugin files
+require_once NETCHAT_DIR . 'includes/style-delivery.php';
 require_once NETCHAT_DIR . 'includes/leads-settings.php';
 require_once NETCHAT_DIR . 'includes/helpers.php';
 require_once NETCHAT_DIR . 'includes/admin.php';
