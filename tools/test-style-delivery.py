@@ -11,10 +11,16 @@ S=R;M=S/'includes/style-delivery.php'
 files={p.name:p.read_text(encoding='utf8')for p in(S/'assets/css').glob('*.css')}
 code=(R/'tests/css-delivery-guards.php').read_text(encoding='utf8').replace('/* PAYLOAD */',"$GLOBALS['files']=json_decode(base64_decode('"+base64.b64encode(json.dumps(files).encode()).decode()+"'),true);")
 code=code.replace('/* MODULE */',M.read_text(encoding='utf8').replace('<?php','',1))
-cmd=['docker','exec','-i',args.docker_container,args.php,'-n']if args.docker_container else[args.php,'-n']
+# JSON is a shared extension on PHP 7.2: keep the configured CLI in hosted runs.
+# Disable only automatic prepend/append files; never bootstrap WordPress here.
+cmd=['docker','exec','-i',args.docker_container,args.php,'-n']if args.docker_container else[args.php,'-d','auto_prepend_file=','-d','auto_append_file=']
+probe=subprocess.run(cmd+['-r','if (!function_exists("json_decode") || !function_exists("json_encode")) { fwrite(STDERR, "CSS guards require PHP JSON functions; enable JSON in the configured CLI.\\n"); exit(2); } echo "PHP ".PHP_VERSION." JSON available\\n";'],capture_output=True)
+if probe.returncode or probe.stderr:raise SystemExit(probe.stdout.decode('utf8','replace')+probe.stderr.decode('utf8','replace'))
 p=subprocess.run(cmd,input=code.encode(),capture_output=True)
 if p.returncode or p.stderr:raise SystemExit(p.stdout.decode('utf8','replace')+p.stderr.decode('utf8','replace'))
 report=json.loads(p.stdout)
+report['php_json_probe']=probe.stdout.decode('utf8','replace').strip()
+report['php_configuration']='container_no_ini'if args.docker_container else'configured_cli_prepend_append_disabled'
 runtime={'netchat.php','uninstall.php','readme.txt','LICENSE','includes/service-presets.json'}
 runtime.update(p.relative_to(S).as_posix()for p in(S/'includes').glob('*.php'))
 for folder in ['assets','languages']:

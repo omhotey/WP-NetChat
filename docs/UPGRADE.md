@@ -1,6 +1,6 @@
 # Установка и обновление NetChat 1.2.3
 
-Текущая сборка: `netchat-wp-1.2.3.zip` после `python tools/build-release.py` в `dist/release-1.2.3/`. Публикация релиза 1.2.3 этой редакцией не утверждается. Корень внутри архива — только `netchat/`, входной файл — `netchat/netchat.php`. Манифест и `SHA256SUMS.txt` создаются рядом с ZIP. Старые релизы сохраняются как история.
+Пакет версии 1.2.3 — `netchat-wp-1.2.3.zip` со [страницы релизов](https://github.com/omhotey/WP-NetChat/releases). При сборке через `python tools/build-release.py` тот же архив создаётся в `dist/release-1.2.3/`. Корень внутри архива — только `netchat/`, входной файл — `netchat/netchat.php`. Сверьте ZIP с его манифестом и `SHA256SUMS.txt`; результаты проверок ревизии доступны в [GitHub Actions](https://github.com/omhotey/WP-NetChat/actions/workflows/ci.yml). Старые релизы сохраняются как история.
 
 ## Новая установка или установленная папка netchat/
 
