@@ -4,11 +4,17 @@ import {resolve} from 'node:path';
 import {createRequire} from 'node:module';
 if(process.env.GITHUB_ACTIONS!=='true')throw Error('Hosted disposable WordPress worker required.');
 const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAYWRIGHT_MODULE_PATH||'playwright');
-const origin=process.env.NETCHAT_TEST_ORIGIN||'http://localhost:8080',output=resolve('dist/release-1.2.2/scroll-browser');mkdirSync(output,{recursive:true});
+const origin=process.env.NETCHAT_TEST_ORIGIN||'http://localhost:8080',output=resolve('dist/release-1.2.3/scroll-browser');mkdirSync(output,{recursive:true});
 const browser=await chromium.launch({headless:true}),context=await browser.newContext({viewport:{width:1440,height:900}}),admin=await context.newPage(),page=await context.newPage(),errors=[],checks=[];
 page.on('pageerror',e=>errors.push(e.message));admin.on('pageerror',e=>errors.push('admin: '+e.message));let original,primaryFailure;
 async function config(overrides){await admin.reload({waitUntil:'domcontentloaded'});await admin.waitForFunction(()=>window.netchatAdmin);return admin.evaluate(async overrides=>{const c={...netchatAdmin.config,...overrides};const r=await fetch(netchatAdmin.restUrl,{method:'POST',headers:{'Content-Type':'application/json','X-WP-Nonce':netchatAdmin.restNonce},body:JSON.stringify({...c,revision:netchatAdmin.revision})});const data=await r.json();if(!r.ok)throw Error(JSON.stringify(data));return data.config;},overrides);}
-async function frontendReady(target){await target.waitForFunction(()=>{const link=Array.from(document.querySelectorAll('link[rel="stylesheet"]')).find(e=>new URL(e.href).pathname.endsWith('/assets/css/style.css'));return typeof window.NetChat?.open==='function'&&typeof window.NetChatServiceForms?.open==='function'&&link?.sheet&&!link.disabled;});}
+async function frontendReady(target){await target.waitForFunction(()=>{
+ const widget=document.querySelector('#netchat');
+ if(!widget||typeof window.NetChat?.open!=='function'||typeof window.NetChatServiceForms?.open!=='function')return false;
+ const styles=[...document.querySelectorAll('style#netchat-front-css'),...Array.from(document.querySelectorAll('link#netchat-front-css[rel="stylesheet"]')).filter(e=>new URL(e.href).pathname.endsWith('/assets/css/style.css'))];
+ const loaded=styles.some(e=>{try{return !e.disabled&&e.sheet&&!e.sheet.disabled&&e.sheet.cssRules.length>0&&(!e.media||matchMedia(e.media).matches);}catch{return false;}});
+ return loaded&&getComputedStyle(widget).position==='fixed';
+});}
 async function load(){await page.goto(origin+'/netchat-test/',{waitUntil:'domcontentloaded'});await frontendReady(page);await page.evaluate(()=>{document.documentElement.style.scrollBehavior='auto';document.body.style.margin='0';document.querySelector('#nc-scroll-fixture').style.height='4000px';scrollTo(0,0);});await page.waitForTimeout(80);}
 async function scroll(percent,offset=0){await page.evaluate(({percent,offset})=>{const d=document.scrollingElement;scrollTo(0,Math.ceil((d.scrollHeight-innerHeight)*percent/100)+offset);},{percent,offset});await page.waitForTimeout(80);}
 const button=page.locator('#nc-toggle'),hint=page.locator('#nc-hint');
